@@ -6,9 +6,9 @@ const mongoDB = require("./Utils/MongoDBManager");
 
 app.get("/lobbies", (req, res) => {
   let dataPlayers = [];
-  let keys = Object.keys(data);
+  let keys = Object.keys(lobbies);
   keys.forEach((key) => {
-    dataPlayers.push({ name: key,creator:data[key].creator, players: data[key].players.length, lobbySize: data[key].rules.lobbySize });
+    dataPlayers.push({ name: key,creator:lobbies[key].creator, players: lobbies[key].players.length, lobbySize: lobbies[key].rules.lobbySize });
   });
   res.send({ lobbies: dataPlayers });
 });

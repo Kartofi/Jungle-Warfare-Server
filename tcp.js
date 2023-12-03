@@ -17,9 +17,7 @@ server.on("connection", (socket) => {
       return;
     }
 
-    if (json.type == "nameCheck") {
-      nameCheck(socket, json);
-    } else if (json.type == "join") {
+    if (json.type == "join") {
       if (connectedPlayers.find((element) => element.name == json.name)) {
         socket.write(
           JSON.stringify({
@@ -35,7 +33,7 @@ server.on("connection", (socket) => {
       sessionId = json.sessionId;
       lobbyId = json.lobbyId;
 
-      if (data[json.lobbyId] == null) {
+      if (lobbies[json.lobbyId] == null) {
         let dataToSend = JSON.stringify({
           type: "ExitGame",
           request: "Lobby is not available : " + json.lobbyId,
@@ -88,16 +86,7 @@ function broadcast(message, lobbyId, senderSocket) {
   });
 }
 
-function nameCheck(socket, json) {
-  let player = data.lobby1.players.find(
-    (element) => element.name == json.request
-  );
-  if (player) {
-    socket.write(JSON.stringify({ name: "taken", type: "notSuccess" }));
-    return;
-  }
-  socket.write(JSON.stringify({ name: "empty", type: "Success" }));
-}
+
 
 function removePlayer(name, deviceId, sessionId) {
   const playerInstance = connectedPlayers.find(

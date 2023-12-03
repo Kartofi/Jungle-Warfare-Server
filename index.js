@@ -19,6 +19,13 @@ server.on("listening", () => {
 });
 
 const fs = require("fs");
+
+global.version = "1.0.0";
+
+global.currentVersionHash = "47cd76e43f74bbc2e1baaf194d07e1fa";
+//crypto.createHash('md5').update(version).digest('hex');;
+
+
 global.weaponsRules = [
   {
     WeaponName: "Rifle",
@@ -58,7 +65,7 @@ let defaultRulesForPlayer = {
 
   weaponsRules: weaponsRules,
 };
-global.data = {
+global.lobbies = {
 
 };
 
@@ -73,10 +80,10 @@ global.rules = {
   spawnPos: new Vectors.Vector3(0, 1.5, 0),
 };
 function randomLobby() {
-  let keys = Object.keys(data);
+  let keys = Object.keys(lobbies);
   let notFullLobbies = [];
   keys.forEach((key) => {
-    if (data[key].players.length < data[key].rules.lobbySize) {
+    if (lobbies[key].players.length < lobbies[key].rules.lobbySize) {
       notFullLobbies.push(key);
     }
   });
@@ -91,13 +98,13 @@ function randomLobby() {
   }
 }
 function getWeaponData(name, lobby) {
-  if (data[lobby] == null) {
+  if (lobbies[lobby] == null) {
     return;
   }
 
   let found = null;
 
-  data[lobby].rules.weaponsRules.forEach((item) => {
+  lobbies[lobby].rules.weaponsRules.forEach((item) => {
     if (item.WeaponName == name) {
       found = item;
     }
@@ -106,16 +113,16 @@ function getWeaponData(name, lobby) {
   return found;
 }
 function randomWeapon(lobby) {
-  if (data[lobby] == null) {
+  if (lobbies[lobby] == null) {
     return;
   }
-  return data[lobby].rules.weaponsRules[1];
+  return lobbies[lobby].rules.weaponsRules[1];
 }
 function checkIfSessionIsIn(sessionId) {
-  var keys = Object.keys(data);
+  var keys = Object.keys(lobbies);
   let found = null;
   keys.forEach((key) => {
-    let checkIfSessionIsIn = data[key].players.find(
+    let checkIfSessionIsIn = lobbies[key].players.find(
       (element) => element.sessionId == sessionId
     );
     if (checkIfSessionIsIn != null) {
@@ -125,10 +132,10 @@ function checkIfSessionIsIn(sessionId) {
   return found;
 }
 function checkIfDeviceIdIsIn(deviceId) {
-  var keys = Object.keys(data);
+  var keys = Object.keys(lobbies);
   let found = null;
   keys.forEach((key) => {
-    let checkIfDeviceIdIsIn = data[key].players.find(
+    let checkIfDeviceIdIsIn = lobbies[key].players.find(
       (element) => element.deviceId == deviceId
     );
     if (checkIfDeviceIdIsIn != null) {
@@ -138,10 +145,10 @@ function checkIfDeviceIdIsIn(deviceId) {
   return found;
 }
 function checkIfNameIsIn(name) {
-  var keys = Object.keys(data);
+  var keys = Object.keys(lobbies);
   let found = null;
   keys.forEach((key) => {
-    let checkIfSessionIsIn = data[key].players.find(
+    let checkIfSessionIsIn = lobbies[key].players.find(
       (element) => element.name == name
     );
     if (checkIfSessionIsIn != null) {
@@ -151,10 +158,10 @@ function checkIfNameIsIn(name) {
   return found;
 }
 function getPlayerUsingName(name) {
-  var keys = Object.keys(data);
+  var keys = Object.keys(lobbies);
   let found = null;
   keys.forEach((key) => {
-    let checkIfSessionIsIn = data[key].players.find(
+    let checkIfSessionIsIn = lobbies[key].players.find(
       (element) => element.name == name
     );
     if (checkIfSessionIsIn != null) {
@@ -164,16 +171,16 @@ function getPlayerUsingName(name) {
   return found;
 }
 function RemovePlayerUsingName(name) {
-  var keys = Object.keys(data);
+  var keys = Object.keys(lobbies);
 
   keys.forEach((match) => {
-    data[match].players.forEach((element) => {
+    lobbies[match].players.forEach((element) => {
       if (element && element.name == name) {
-        var index = data[match].players.indexOf(element);
+        var index = lobbies[match].players.indexOf(element);
         if (index > -1) {
-          data[match].players.splice(index, 1);
-          if (data[match].players.length <= 0) {
-            delete data[match];
+          lobbies[match].players.splice(index, 1);
+          if (lobbies[match].players.length <= 0) {
+            delete lobbies[match];
             console.log("Removed match :" + match);
           }
         }
@@ -188,7 +195,7 @@ async function HandleShooting(json, info) {
     if (match == null) {
       return;
     }
-    let lobbyInstance = data[match];
+    let lobbyInstance = lobbies[match];
     let shooterInstance = lobbyInstance.players.find(
       (element) =>
         element.name == json.name &&
@@ -271,7 +278,7 @@ function HandleShootIndicator(json, info) {
   if (match == null) {
     return;
   }
-  let shooterInstance = data[match].players.find(
+  let shooterInstance = lobbies[match].players.find(
     (element) =>
       element.name == json.from &&
       element.deviceId == json.deviceId &&
@@ -312,7 +319,7 @@ async function HandleReload(json, info) {
   if (lobby == null) {
     return;
   }
-  let playerInstance = data[lobby].players.find(
+  let playerInstance = lobbies[lobby].players.find(
     (element) =>
       element.name == json.name &&
       element.deviceId == json.deviceId &&
@@ -343,7 +350,7 @@ function HandleBullets(json, info) {
   if (lobby == null) {
     return;
   }
-  let shooterInstance = data[lobby].players.find(
+  let shooterInstance = lobbies[lobby].players.find(
     (element) =>
       element.name == json.from &&
       element.deviceId == json.deviceId &&
@@ -377,8 +384,8 @@ function HandleDisconnect(json, info) {
       playerInstance.lobbyId,
       null
     );
-    if (data[playerInstance.lobbyId].players.length <= 0) {
-      delete data[playerInstance.lobbyId];
+    if (lobbies[playerInstance.lobbyId].players.length <= 0) {
+      delete lobbies[playerInstance.lobbyId];
       console.log("Removed lobby: " + playerInstance.lobbyId);
     }
     RemovePlayerUsingName(json.name);
@@ -437,6 +444,14 @@ async function HandleUpdate(json, server, info) {
   }
   if (playerInstance == null) {
     if (mongoDB.isConnected() == false) {
+      server.send(
+        JSON.stringify({
+          type: "ExitGame",
+          reason: "There was a problem please try again later.",
+        }),
+        info.port,
+        info.address
+      );
       return;
     }
     let accountCredentialsCheck = await mongoDB.CheckCredentials(
@@ -481,9 +496,9 @@ async function HandleUpdate(json, server, info) {
       } else {
         lobby = json.lobbyId;
       }
-      let lobbies = Object.keys(data);
+      let lobbies = Object.keys(lobbies);
       if (!lobbies.includes(lobby)) {
-        data[lobby] = {
+        lobbies[lobby] = {
           players: [],
           creator: json.name,
           rules:
@@ -509,7 +524,7 @@ async function HandleUpdate(json, server, info) {
         return;
       }
     }
-    if (data[lobby].rules.lobbySize == data[lobby].players.length) {
+    if (lobbies[lobby].rules.lobbySize == lobbies[lobby].players.length) {
       // check if lobby is full
       server.send(
         JSON.stringify({
@@ -523,7 +538,7 @@ async function HandleUpdate(json, server, info) {
     }
     console.log("Player: " + json.name + " joined!");
     let weapon = randomWeapon(lobby);
-    data[lobby].players.push({
+    lobbies[lobby].players.push({
       name: json.name,
       deviceId: json.deviceId,
       sessionId: sessionId,
@@ -531,7 +546,7 @@ async function HandleUpdate(json, server, info) {
       ping: json.ping,
       ip: info.address,
       weapon: weapon == null ? "" : weapon.WeaponName,
-      health: data[lobby].rules.maxHealth,
+      health: lobbies[lobby].rules.maxHealth,
       bullets: weapon == null ? 0 : weapon.bulletsMax,
       isDead: false,
       state: "idle",
@@ -550,7 +565,7 @@ async function HandleUpdate(json, server, info) {
       reloading: false,
     });
 
-    const players = data[lobby].players.map(
+    const players = lobbies[lobby].players.map(
       ({ ip, deviceId, sessionId, lastUpdate, lastShoot, lobbyId, ...rest }) =>
         rest
     );
@@ -562,7 +577,7 @@ async function HandleUpdate(json, server, info) {
         correctPosition: rules.spawnPos.JsonObj,
         sessionId: sessionId,
         lobbyId: lobby,
-        rules: Object.assign({}, data[lobby].rules, {
+        rules: Object.assign({}, lobbies[lobby].rules, {
           maxMoveDistance: rules.maxMoveDistance,
         }),
         players: players,
@@ -592,7 +607,7 @@ async function HandleUpdate(json, server, info) {
       if (checkIfSessionIsIn(json.sessionId) == null) {
         return;
       }
-      const players = data[playerInstance.lobbyId].players.map(
+      const players = lobbies[playerInstance.lobbyId].players.map(
         ({
           ip,
           deviceId,
@@ -619,14 +634,14 @@ async function HandleUpdate(json, server, info) {
   if (checkIfSessionIsIn(json.sessionId) == null) {
     return;
   }
-  const players = data[playerInstance.lobbyId].players.map(
+  const players = lobbies[playerInstance.lobbyId].players.map(
     ({ ip, deviceId, sessionId, lastUpdate, lastShoot, lobbyId, ...rest }) =>
       rest
   );
   server.send(
     JSON.stringify({
       players: players,
-      rules: data[playerInstance.lobbyId].rules,
+      rules: lobbies[playerInstance.lobbyId].rules,
     }),
     info.port,
     info.address
@@ -635,14 +650,14 @@ async function HandleUpdate(json, server, info) {
 
 function RemoveNotUpdated() {
   let time = new Date().getTime();
-  var keys = Object.keys(data);
+  var keys = Object.keys(lobbies);
 
   keys.forEach((lobby) => {
-    data[lobby].players.forEach((element) => {
+    lobbies[lobby].players.forEach((element) => {
       if (element.lastUpdate && time - element.lastUpdate >= 10000) {
-        var index = data[lobby].players.indexOf(element);
+        var index = lobbies[lobby].players.indexOf(element);
         if (index > -1) {
-          data[lobby].players.splice(index, 1);
+          lobbies[lobby].players.splice(index, 1);
           console.log("Player: " + element.name + " lost connection!");
           tcp.broadcast(
             JSON.stringify({
@@ -653,8 +668,8 @@ function RemoveNotUpdated() {
             lobby,
             null
           );
-          if (data[lobby].players.length <= 0) {
-            delete data[lobby];
+          if (lobbies[lobby].players.length <= 0) {
+            delete lobbies[lobby];
             console.log("Removed lobby: " + lobby);
           }
         }
@@ -694,7 +709,7 @@ server.on("message", async (message, info) => {
     }
     player.lastUpdate = time;
     player.state = json.state;
-    const players = data[player.lobbyId].players.map(
+    const players = lobbies[player.lobbyId].players.map(
       ({ ip, deviceId, sessionId, lastUpdate, lastShoot, ...rest }) => rest
     );
     server.send(JSON.stringify({ players: players }), info.port, info.address);
