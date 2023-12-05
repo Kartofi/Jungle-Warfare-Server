@@ -15,9 +15,14 @@ app.get("/lobbies", (req, res) => {
 app.get("/login", async (req, res) => {
   let name = req.query.name;
   let password = req.query.password;
+  let versionHash = req.query.versionHash;
 
   if (!name || !password) {
     res.send({ status: "unSuccessful" });
+    return;
+  }
+  if (versionHash != currentVersionHash){
+    res.send({ status: "outdatedClient" });
     return;
   }
 

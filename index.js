@@ -470,6 +470,18 @@ async function HandleUpdate(json, server, info) {
       return;
     }
   }
+  if (json.versionHash != currentVersionHash){
+    server.send(
+      JSON.stringify({
+        type: "ExitGame",
+        reason: "Outdated client please update.",
+      }),
+      info.port,
+      info.address
+    );
+    return;
+  }
+
   let time = new Date().getTime();
   if (playerInstance == null) {
     if (
@@ -496,8 +508,8 @@ async function HandleUpdate(json, server, info) {
       } else {
         lobby = json.lobbyId;
       }
-      let lobbies = Object.keys(lobbies);
-      if (!lobbies.includes(lobby)) {
+      let lobbiesKeys = Object.keys(lobbies);
+      if (!lobbiesKeys.includes(lobby)) {
         lobbies[lobby] = {
           players: [],
           creator: json.name,
@@ -536,7 +548,7 @@ async function HandleUpdate(json, server, info) {
       );
       return;
     }
-    console.log("Player: " + json.name + " joined!");
+    console.log("Player: " + json.name + " joined lobby:" + lobby + "!");
     let weapon = randomWeapon(lobby);
     lobbies[lobby].players.push({
       name: json.name,
