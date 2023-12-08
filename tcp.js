@@ -9,6 +9,9 @@ server.on("connection", (socket) => {
   let deviceId;
   let sessionId;
   let lobbyId;
+
+  socket.setKeepAlive(true,10000);
+
   socket.on("data", (receiveData) => {
     let json;
     try {
@@ -73,6 +76,7 @@ server.on("connection", (socket) => {
     removePlayer(name, deviceId, sessionId);
   });
   socket.on("error", (error) => {
+    console.log(error)
     removePlayer(name, deviceId, sessionId);
   });
 });
