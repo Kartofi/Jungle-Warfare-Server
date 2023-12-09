@@ -26,7 +26,7 @@ function isConnected() {
   return !!client && !!client.topology && client.topology.isConnected()
 }
 async function CheckCredentials(name, password) {
-  let collection = await client.db("Accounts").collection("Accounts");
+  let collection = client.db("Accounts").collection("Accounts");
   let player = await collection.findOne({ name: name, password: password });
 
   if (player != null) {
@@ -35,5 +35,18 @@ async function CheckCredentials(name, password) {
     return false;
   }
 }
+async function GetAccountData(name){
+  let collection = client.db("Accounts").collection("Accounts");
+  let player = await collection.findOne({ name: name});
 
-module.exports = { CheckCredentials, isConnected };
+  if (player != null) {
+    return player;
+  } else {
+    return null;
+  }
+}
+async function CreateAccount(name,password,avatar){
+  let collection = client.db("Accounts").collection("Accounts");
+  collection.insertOne({name: name,password:password,avatar:avatar})
+}
+module.exports = { CheckCredentials, isConnected, GetAccountData,CreateAccount };
