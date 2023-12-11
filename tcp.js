@@ -4,6 +4,8 @@ var server = net.createServer();
 
 let connectedPlayers = [];
 
+var moderateText = require("./Utils/moderateText")
+
 server.on("connection", (socket) => {
   let name;
   let deviceId;
@@ -66,6 +68,7 @@ server.on("connection", (socket) => {
       ) {
         return;
       }
+      json.request = moderateText.CensorBadWords(json.request);
       broadcast(JSON.stringify(json), lobbyId, null);
     }
   });

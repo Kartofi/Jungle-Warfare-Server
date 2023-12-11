@@ -2,11 +2,18 @@ const express = require("express");
 const fs = require("fs")
 
 const app = express();
+var bodyParser = require('body-parser')
+
 const port = 2223;
 
 const mongoDB = require("./Utils/MongoDBManager");
 
-app.get("/lobbies", (req, res) => {
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+})); 
+
+app.get("/api/lobbies", (req, res) => {
   let dataPlayers = [];
   let keys = Object.keys(lobbies);
   keys.forEach((key) => {
@@ -14,10 +21,10 @@ app.get("/lobbies", (req, res) => {
   });
   res.send({ lobbies: dataPlayers });
 });
-app.get("/login", async (req, res) => {
-  let name = req.query.name;
-  let password = req.query.password;
-  let versionHash = req.query.versionHash;
+app.post("/api/login", async (req, res) => {
+  let name = req.body.name;
+  let password = req.body.password;
+  let versionHash = req.body.versionHash;
 
   if (!name || !password) {
     res.send({ status: "unSuccessful" });
@@ -46,7 +53,9 @@ app.get("/user/:name", async (req,res) => {
     res.send({ status: "User not found!" });
     return;
   }
-  let json = {name: data.name, avatar: req.protocol + "://" + req.headers.host + "/images/users/" + name}
+  let profilePictureUrl = req.protocol + "://" + req.headers.host + "/images/users/" + name;
+
+  let json = {name: data.name, profilePicture: profilePictureUrl}
 
   res.send(json);
 })
@@ -61,7 +70,7 @@ app.get("/images/users/:name",async (req,res) =>{
     res.send({ status: "User not found!" });
     return;
   }
-  var img = Buffer.from(data.avatar.toString("base64"), 'base64');
+  var img = Buffer.from(data.profilePicture.toString("base64"), 'base64');
 
   res.contentType('image/png');
   res.send(img);
