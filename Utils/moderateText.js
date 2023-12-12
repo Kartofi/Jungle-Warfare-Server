@@ -1,21 +1,41 @@
-var Filter = require('bad-words');
+let fs = require("fs")
 
-var customFilter = new Filter({ placeHolder: '#'});
 
 const wash = require('washyourmouthoutwithsoap');
-//customFilter.addWords(...wash.words('bg'));
+
+
+let data = [];
+wash.supported().forEach((element)=>{
+    data = data.concat(wash.words(element));
+})
+
+let custom = fs.readFileSync("./Settings/customBadWords.json")
+custom = JSON.parse(custom);
+data = data.concat(custom);
+
+function compareNumbers(a, b) {
+    return a.length - b.length;
+  }
+data.sort(compareNumbers).reverse();
+fs.writeFileSync("./Settings/badwords.json",JSON.stringify(data))
+
+
+let words = fs.readFileSync("./Settings/badwords.json");
+words = JSON.parse(words);
 
 function CensorBadWords(message){
-    if (!HaveBadWords(message)){
-        return message;
-    }
-
-    return "no";
+    words.forEach(element => {
+        if (message.includes(element) == true){
+            message = message.replaceAll(element,"#".repeat(element.length))
+        }
+    });
+    return message;
 }
 function HaveBadWords(message){
-    let bg = wash.check('bg',message);
-    let en = wash.check('en',message);
-
-   return bg || en;
+   if (CensorBadWords(message) != message){
+    return true;
+   }
+   return true;
 }
+console.log(CensorBadWords("оо как си брат дееба и педала идиот"))
 module.exports = {CensorBadWords, HaveBadWords}
