@@ -6,11 +6,15 @@ const Vectors = require("./Utils/Vectors");
 const Basic = require("./Utils/Basic");
 const AntiCheat = require("./Utils/AntiCheat");
 const mongoDB = require("./Utils/MongoDBManager");
+const udpErrors = require("./Utils/udpErrors");
+
+
 
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const tcp = require("./tcp");
 const startMenuTcp = require("./startMenuHttp");
+
 
 const port = 2222;
 server.on("listening", () => {
@@ -26,7 +30,7 @@ global.currentVersionHash = "47cd76e43f74bbc2e1baaf194d07e1fa";
 //crypto.createHash('md5').update(version).digest('hex');;
 
 
-global.weaponsRules = [
+global.defaultWeaponsRules = [
   {
     WeaponName: "Rifle",
     shootCooldown: 0.1,
@@ -63,7 +67,7 @@ let defaultRulesForPlayer = {
 
   lobbySize: 20,
 
-  weaponsRules: weaponsRules,
+  weaponsRules: defaultWeaponsRules,
 };
 global.lobbies = {
 
@@ -116,7 +120,7 @@ function randomWeapon(lobby) {
   if (lobbies[lobby] == null) {
     return;
   }
-  return lobbies[lobby].rules.weaponsRules[1];
+  return lobbies[lobby].rules.weaponsRules[0];
 }
 function checkIfSessionIsIn(sessionId) {
   var keys = Object.keys(lobbies);
@@ -227,13 +231,8 @@ async function HandleShooting(json, info) {
       shooterInstance.reloading == false
     ) {
       
-      targetInstance.health -= CalculateDamage(
-        weaponData.damage,
-        weaponData.headShotMultiplier,
-        json.positionHit,
-        targetInstance.position,
-        targetInstance.CameraData
-        ); // take health
+      targetInstance.health -= json.headShot ? weaponData.damage * weaponData.headShotMultiplier : weaponData.damage
+         // take health
         
       if (targetInstance.health <= 0) {
         targetInstance.health = 0;
@@ -262,15 +261,6 @@ async function HandleShooting(json, info) {
   } catch (error) {
     console.log(error);
   }
-}
-function CalculateDamage(weaponDamage, multiplier,hitPos,otherPlayerPos){
-  let headPos = new Vectors.Vector3(otherPlayerPos.x,otherPlayerPos.y + rules.headPosY,otherPlayerPos.z);
-    if (Vectors.subVectors(headPos, hitPos).magnitude <= rules.headRadius){
-      return weaponDamage * multiplier;
-    }else {
-  
-      return weaponDamage;
-    }
 }
 function HandleShootIndicator(json, info) {
   let time = new Date().getTime();
@@ -472,10 +462,7 @@ async function HandleUpdate(json, server, info) {
   }
   if (json.versionHash != currentVersionHash){
     server.send(
-      JSON.stringify({
-        type: "ExitGame",
-        reason: "Outdated client please update.",
-      }),
+      udpErrors.outDatedClient,
       info.port,
       info.address
     );
@@ -490,10 +477,7 @@ async function HandleUpdate(json, server, info) {
       json.sessionId
     ) {
       server.send(
-        JSON.stringify({
-          type: "ExitGame",
-          reason: "There was a problem please rejoin.",
-        }),
+        udpErrors.problemRejoin,
         info.port,
         info.address
       );
@@ -515,7 +499,7 @@ async function HandleUpdate(json, server, info) {
           creator: json.name,
           rules:
             !json.rules ||
-            json.rules.weaponsRules.length < weaponsRules.length ||
+            json.rules.weaponsRules.length < defaultWeaponsRules.length ||
             json.rules.lobbySize <= 0
               ? defaultRulesForPlayer
               : json.rules,
@@ -526,10 +510,7 @@ async function HandleUpdate(json, server, info) {
       lobby = randomLobby();
       if (lobby == null) {
         server.send(
-          JSON.stringify({
-            type: "ExitGame",
-            reason: "There are no joinable lobbies, please create one.",
-          }),
+          udpErrors.joinableLobbies,
           info.port,
           info.address
         );

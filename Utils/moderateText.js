@@ -1,8 +1,8 @@
 let fs = require("fs")
+var filter = require('leo-profanity');
 
-
+/*
 const wash = require('washyourmouthoutwithsoap');
-
 
 let data = [];
 wash.supported().forEach((element)=>{
@@ -12,24 +12,15 @@ wash.supported().forEach((element)=>{
 let custom = fs.readFileSync("./Settings/customBadWords.json")
 custom = JSON.parse(custom);
 data = data.concat(custom);
-
-function compareNumbers(a, b) {
-    return a.length - b.length;
-  }
-data.sort(compareNumbers).reverse();
 fs.writeFileSync("./Settings/badwords.json",JSON.stringify(data))
-
-
-let words = fs.readFileSync("./Settings/badwords.json");
-words = JSON.parse(words);
+*/
+let badwords = fs.readFileSync("./Settings/badwords.json");
+badwords = JSON.parse(badwords);
+filter.add(badwords);
 
 function CensorBadWords(message){
-    words.forEach(element => {
-        if (message.includes(element) == true){
-            message = message.replaceAll(element,"#".repeat(element.length))
-        }
-    });
-    return message;
+   
+    return filter.clean(message);
 }
 function HaveBadWords(message){
    if (CensorBadWords(message) != message){
@@ -37,5 +28,4 @@ function HaveBadWords(message){
    }
    return true;
 }
-console.log(CensorBadWords("оо как си брат дееба и педала идиот"))
 module.exports = {CensorBadWords, HaveBadWords}
