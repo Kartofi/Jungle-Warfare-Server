@@ -34,8 +34,8 @@ global.defaultWeaponsRules = [
   {
     WeaponName: "Rifle",
     shootCooldown: 0.1,
-    walkSpeed: 5,
-    reloadWalkSpeed: 2.5,
+    walkSpeed: 7,
+    reloadWalkSpeed: 5,
     recoilMultiplier: 1,
     shootMaxDistance: 20,
     shootIndicatorDistance: 20,
@@ -47,8 +47,8 @@ global.defaultWeaponsRules = [
   {
     WeaponName: "Revolver",
     shootCooldown: 0.5,
-    walkSpeed: 5,
-    reloadWalkSpeed: 3.5,
+    walkSpeed: 7,
+    reloadWalkSpeed: 6,
     recoilMultiplier: 5,
     shootMaxDistance: 40,
     shootIndicatorDistance: 40,
@@ -116,11 +116,17 @@ function getWeaponData(name, lobby) {
 
   return found;
 }
+let i = -1;
 function randomWeapon(lobby) {
   if (lobbies[lobby] == null) {
     return;
   }
-  return lobbies[lobby].rules.weaponsRules[0];
+  i++;
+  if (i == 2){
+    i = 0;
+  }
+  return lobbies[lobby].rules.weaponsRules[i];
+ 
 }
 function checkIfSessionIsIn(sessionId) {
   var keys = Object.keys(lobbies);
@@ -390,10 +396,7 @@ async function HandleUpdate(json, server, info) {
       playerInstance.deviceId != json.deviceId)
   ) {
     server.send(
-      JSON.stringify({
-        type: "ExitGame",
-        reason: "Account logged from another location.",
-      }),
+      udpErrors.accountLoggedFromAnotherLocation,
       info.port,
       info.address
     );
@@ -401,32 +404,23 @@ async function HandleUpdate(json, server, info) {
   }
   if (json.name.length <= 0) {
     server.send(
-      JSON.stringify({
-        type: "ExitGame",
-        reason: "Account name is too short.",
-      }),
+      udpErrors.nameTooShort,
       info.port,
       info.address
     );
     return;
   } else if (json.name.length > 20) {
     server.send(
-      JSON.stringify({
-        type: "ExitGame",
-        reason: "Account name is too long.",
-      }),
+      udpErrors.nameTooLong,
       info.port,
       info.address
     );
     return;
   }
 
-  if (json.password.length <= 0) {
+  if (json.loginSessionId.length <= 0) {
     server.send(
-      JSON.stringify({
-        type: "ExitGame",
-        reason: "Account password is too short.",
-      }),
+      udpErrors.loginSessionIdTooShort,
       info.port,
       info.address
     );
@@ -435,25 +429,19 @@ async function HandleUpdate(json, server, info) {
   if (playerInstance == null) {
     if (mongoDB.isConnected() == false) {
       server.send(
-        JSON.stringify({
-          type: "ExitGame",
-          reason: "There was a problem please try again later.",
-        }),
+        udpErrors.problemTryAgain,
         info.port,
         info.address
       );
       return;
     }
-    let accountCredentialsCheck = await mongoDB.CheckCredentials(
+    let accountCredentialsCheck = await mongoDB.CheckSessionId(
       json.name,
-      json.password
+      json.loginSessionId
     );
     if (accountCredentialsCheck == false) {
       server.send(
-        JSON.stringify({
-          type: "ExitGame",
-          reason: "Wrong password or name!",
-        }),
+        udpErrors.wrongLoginSession,
         info.port,
         info.address
       );

@@ -35,8 +35,45 @@ app.post("/api/login", async (req, res) => {
     return;
   }
 
-  let playerCorrect = await mongoDB.CheckCredentials(name, password);
-  if (playerCorrect == false) {
+  let loginSessionId = await mongoDB.Login(name, password);
+  if (loginSessionId == null) {
+    res.send({ status: "unSuccessful" });
+    return;
+  }
+  res.send({ status: "Successful", loginSessionId: loginSessionId });
+});
+app.post("/api/logout", async (req, res) => {
+  let name = req.body.name;
+  let loginSessionId = req.body.loginSessionId;
+
+  if (!name || !loginSessionId) {
+    res.send({ status: "unSuccessful" });
+    return;
+  }
+
+
+  let logOutSuccessful = await mongoDB.LogOut(name, loginSessionId);
+  if (logOutSuccessful == false) {
+    res.send({ status: "unSuccessful" });
+    return;
+  }
+  res.send({ status: "Successful"});
+});
+app.post("/api/sessionLogin", async (req, res) => {
+  let name = req.body.name;
+  let loginSessionId = req.body.loginSessionId;
+  let versionHash = req.body.versionHash;
+  if (!name || !loginSessionId) {
+    res.send({ status: "unSuccessful" });
+    return;
+  }
+  if (versionHash != currentVersionHash){
+    res.send({ status: "outdatedClient" });
+    return;
+  }
+
+  let correct = await mongoDB.CheckSessionId(name, loginSessionId);
+  if (correct == false) {
     res.send({ status: "unSuccessful" });
     return;
   }

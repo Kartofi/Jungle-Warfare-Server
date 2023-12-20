@@ -79,7 +79,6 @@ server.on("connection", (socket) => {
     removePlayer(name, deviceId, sessionId);
   });
   socket.on("error", (error) => {
-    console.log(error)
     removePlayer(name, deviceId, sessionId);
   });
 });
