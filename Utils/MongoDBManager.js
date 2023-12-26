@@ -11,7 +11,7 @@ const client = new MongoClient(
     },
   }
 );
-
+const fs = require("fs")
 let sessionTimeOUt = 604800000;
 let maxSessions = 5;
 
@@ -21,7 +21,6 @@ async function connect() {
     await client.connect();
 
     console.log("Connected to MongoDB");
-
   } catch (e) {
     console.log(e);
   }
@@ -115,6 +114,6 @@ async function CreateAccount(name,password,avatar){
     return;
   }
   let collection = client.db("Accounts").collection("Accounts");
-  collection.insertOne({name: name,password:password,avatar:avatar})
+  collection.insertOne({name: name,password:password,profilePicture:avatar,loginSessionIds:[]})
 }
 module.exports = { Login,LogOut,CheckSessionId, isConnected, GetAccountData,CreateAccount };

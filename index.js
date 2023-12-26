@@ -9,7 +9,6 @@ const mongoDB = require("./Utils/MongoDBManager");
 const udpErrors = require("./Utils/udpErrors");
 
 
-
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const tcp = require("./tcp");
@@ -82,7 +81,14 @@ global.rules = {
   headRadius: 0.62,
 
   spawnPos: new Vectors.Vector3(0, 1.5, 0),
+
+  maxLobbyPlayers: 50
 };
+
+
+const lobbyManager = require("./Utils/lobbyManager")
+
+
 function randomLobby() {
   let keys = Object.keys(lobbies);
   let notFullLobbies = [];
@@ -111,21 +117,18 @@ function getWeaponData(name, lobby) {
   lobbies[lobby].rules.weaponsRules.forEach((item) => {
     if (item.WeaponName == name) {
       found = item;
+      return;
     }
   });
 
   return found;
 }
-let i = -1;
+
 function randomWeapon(lobby) {
   if (lobbies[lobby] == null) {
     return;
   }
-  i++;
-  if (i == 2){
-    i = 0;
-  }
-  return lobbies[lobby].rules.weaponsRules[i];
+  return lobbies[lobby].rules.weaponsRules[0];
  
 }
 function checkIfSessionIsIn(sessionId) {
@@ -137,6 +140,7 @@ function checkIfSessionIsIn(sessionId) {
     );
     if (checkIfSessionIsIn != null) {
       found = key;
+      return;
     }
   });
   return found;
@@ -150,6 +154,7 @@ function checkIfDeviceIdIsIn(deviceId) {
     );
     if (checkIfDeviceIdIsIn != null) {
       found = key;
+      return;
     }
   });
   return found;
@@ -163,6 +168,7 @@ function checkIfNameIsIn(name) {
     );
     if (checkIfSessionIsIn != null) {
       found = key;
+      return;
     }
   });
   return found;
@@ -488,7 +494,7 @@ async function HandleUpdate(json, server, info) {
           rules:
             !json.rules ||
             json.rules.weaponsRules.length < defaultWeaponsRules.length ||
-            json.rules.lobbySize <= 0
+            json.rules.lobbySize <= 0 || json.rules.lobbySize > rules.maxLobbyPlayers
               ? defaultRulesForPlayer
               : json.rules,
         };
@@ -508,10 +514,7 @@ async function HandleUpdate(json, server, info) {
     if (lobbies[lobby].rules.lobbySize == lobbies[lobby].players.length) {
       // check if lobby is full
       server.send(
-        JSON.stringify({
-          type: "ExitGame",
-          reason: "The lobby is full.",
-        }),
+        udpErrors.lobbyIsFull,
         info.port,
         info.address
       );
@@ -582,7 +585,7 @@ async function HandleUpdate(json, server, info) {
       playerInstance.rotation = json.rotation;
       playerInstance.lastUpdate = time;
       playerInstance.CameraData = json.CameraData;
-      playerInstance.ping = json.ping;
+      playerInstance.ping = Basic.Clamp(json.ping,0,999);
       playerInstance.state = json.state;
     } else {
       if (checkIfSessionIsIn(json.sessionId) == null) {
@@ -690,6 +693,7 @@ server.on("message", async (message, info) => {
     }
     player.lastUpdate = time;
     player.state = json.state;
+    player.ping = Basic.Clamp(json.ping,0,999);
     const players = lobbies[player.lobbyId].players.map(
       ({ ip, deviceId, sessionId, lastUpdate, lastShoot, ...rest }) => rest
     );

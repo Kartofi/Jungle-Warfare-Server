@@ -36,4 +36,8 @@ const wrongLoginSession =  JSON.stringify({
     type: "ExitGame",
     reason: "Invalid account login session.",
   })
-module.exports = {outDatedClient,loginSessionIdTooShort,wrongLoginSession,problemRejoin,problemTryAgain,joinableLobbies,accountLoggedFromAnotherLocation,nameTooShort,nameTooLong}
+  const lobbyIsFull = JSON.stringify({
+    type: "ExitGame",
+    reason: "The lobby is full.",
+  })
+module.exports = {outDatedClient,lobbyIsFull,loginSessionIdTooShort,wrongLoginSession,problemRejoin,problemTryAgain,joinableLobbies,accountLoggedFromAnotherLocation,nameTooShort,nameTooLong}

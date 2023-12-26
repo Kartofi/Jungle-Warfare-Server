@@ -5,6 +5,7 @@ var server = net.createServer();
 let connectedPlayers = [];
 
 var moderateText = require("./Utils/moderateText")
+const Basic = require("./Utils/Basic");
 
 server.on("connection", (socket) => {
   let name;
@@ -70,6 +71,8 @@ server.on("connection", (socket) => {
       }
       json.request = moderateText.CensorBadWords(json.request);
       broadcast(JSON.stringify(json), lobbyId, null);
+    }else if (json.type == "reload") {
+      HandleReload(json);
     }
   });
   socket.on("close", () => {
@@ -82,6 +85,67 @@ server.on("connection", (socket) => {
     removePlayer(name, deviceId, sessionId);
   });
 });
+function getWeaponData(name, lobby) {
+  if (lobbies[lobby] == null) {
+    return;
+  }
+
+  let found = null;
+
+  lobbies[lobby].rules.weaponsRules.forEach((item) => {
+    if (item.WeaponName == name) {
+      found = item;
+      return;
+    }
+  });
+
+  return found;
+}
+function checkIfSessionIsIn(sessionId) {
+  var keys = Object.keys(lobbies);
+  let found = null;
+  keys.forEach((key) => {
+    let checkIfSessionIsIn = lobbies[key].players.find(
+      (element) => element.sessionId == sessionId
+    );
+    if (checkIfSessionIsIn != null) {
+      found = key;
+      return;
+    }
+  });
+  return found;
+}
+async function HandleReload(json) {
+  let time = new Date().getTime();
+  let lobby = checkIfSessionIsIn(json.sessionId);
+  if (lobby == null) {
+    return;
+  }
+  let playerInstance = lobbies[lobby].players.find(
+    (element) =>
+      element.name == json.name &&
+      element.deviceId == json.deviceId &&
+      element.sessionId == json.sessionId
+  );
+  let weaponData = await getWeaponData(playerInstance.weapon, lobby);
+  if (playerInstance == null || weaponData == null) {
+    return;
+  }
+  if (
+    playerInstance.bullets < weaponData.bulletsMax &&
+    time - playerInstance.lastReload > weaponData.reloadTime * 1000
+  ) {
+    playerInstance.reloading = true;
+    broadcast(
+      JSON.stringify({ type: "reload", from: playerInstance.name }),
+      lobby,
+      null
+    );
+    await Basic.Wait(weaponData.reloadTime * 1000);
+    playerInstance.bullets = weaponData.bulletsMax;
+    playerInstance.reloading = false;
+  }
+}
 
 function broadcast(message, lobbyId, senderSocket) {
   connectedPlayers.forEach((client) => {
