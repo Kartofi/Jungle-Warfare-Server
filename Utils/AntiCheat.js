@@ -17,7 +17,7 @@ function PositionChange(server, player, json, time, info) {
     !fasterPacketSend && !imitateOtherPlayer && !moveWhileDead && !moveFaster
   );
 }
-function ShootIndicator(player,weaponData, hit, time, ip) {
+function ShootIndicator(player, weaponData, hit, time, ip) {
   let distance = Vectors.subVectors(
     Vectors.Vector3.fromJSON(hit),
     Vectors.Vector3.fromJSON(player.position)

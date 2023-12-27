@@ -1,23 +1,31 @@
 const express = require("express");
-const fs = require("fs")
+const fs = require("fs");
 
 const app = express();
-var bodyParser = require('body-parser')
+var bodyParser = require("body-parser");
 
 const port = 2223;
 
 const mongoDB = require("./Utils/MongoDBManager");
 
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true
-})); 
+app.use(bodyParser.json()); // to support JSON-encoded bodies
+app.use(
+  bodyParser.urlencoded({
+    // to support URL-encoded bodies
+    extended: true,
+  })
+);
 
 app.get("/api/lobbies", (req, res) => {
   let dataPlayers = [];
   let keys = Object.keys(lobbies);
   keys.forEach((key) => {
-    dataPlayers.push({ name: key,creator:lobbies[key].creator, players: lobbies[key].players.length, lobbySize: lobbies[key].rules.lobbySize });
+    dataPlayers.push({
+      name: key,
+      creator: lobbies[key].creator,
+      players: lobbies[key].players.length,
+      lobbySize: lobbies[key].rules.lobbySize,
+    });
   });
   res.send({ lobbies: dataPlayers });
 });
@@ -30,7 +38,7 @@ app.post("/api/login", async (req, res) => {
     res.send({ status: "unSuccessful" });
     return;
   }
-  if (versionHash != currentVersionHash){
+  if (versionHash != currentVersionHash) {
     res.send({ status: "outdatedClient" });
     return;
   }
@@ -51,13 +59,12 @@ app.post("/api/logout", async (req, res) => {
     return;
   }
 
-
   let logOutSuccessful = await mongoDB.LogOut(name, loginSessionId);
   if (logOutSuccessful == false) {
     res.send({ status: "unSuccessful" });
     return;
   }
-  res.send({ status: "Successful"});
+  res.send({ status: "Successful" });
 });
 app.post("/api/sessionLogin", async (req, res) => {
   let name = req.body.name;
@@ -67,7 +74,7 @@ app.post("/api/sessionLogin", async (req, res) => {
     res.send({ status: "unSuccessful" });
     return;
   }
-  if (versionHash != currentVersionHash){
+  if (versionHash != currentVersionHash) {
     res.send({ status: "outdatedClient" });
     return;
   }
@@ -79,39 +86,52 @@ app.post("/api/sessionLogin", async (req, res) => {
   }
   res.send({ status: "Successful" });
 });
-app.get("/user/:name", async (req,res) => {
-  let name = req.params.name;
-  if (name == null || name == undefined){
-    res.send({ status: "Invalid name!" });
+app.get("/user/:id", async (req, res) => {
+  let id = req.params.id;
+  try {
+    id = Number(id);
+  } catch (e) {
+    res.send({ status: "Invalid id!" });
     return;
   }
-  let data = await mongoDB.GetAccountData(name);
-  if (data == null){
+  if (id == null || id == undefined) {
+    res.send({ status: "Invalid id!" });
+    return;
+  }
+  let data = await mongoDB.GetAccountData(id);
+  if (data == null) {
     res.send({ status: "User not found!" });
     return;
   }
-  let profilePictureUrl = req.protocol + "://" + req.headers.host + "/images/users/" + name;
+  let profilePictureUrl =
+    req.protocol + "://" + req.headers.host + "/images/users/" + id;
 
-  let json = {name: data.name, profilePicture: profilePictureUrl}
+  let json = { name: data.name, profilePicture: profilePictureUrl };
 
   res.send(json);
-})
-app.get("/images/users/:name",async (req,res) =>{
-  let name = req.params.name;
-  if (name == null || name == undefined){
-    res.send({ status: "Invalid name!" });
+});
+app.get("/images/users/:id", async (req, res) => {
+  let id = req.params.id;
+  try {
+    id = Number(id);
+  } catch (e) {
+    res.send({ status: "Invalid id!" });
     return;
   }
-  let data = await mongoDB.GetAccountData(name);
-  if (data == null){
+  if (id == null || id == undefined) {
+    res.send({ status: "Invalid id!" });
+    return;
+  }
+  let data = await mongoDB.GetAccountData(id);
+  if (data == null) {
     res.send({ status: "User not found!" });
     return;
   }
-  var img = Buffer.from(data.profilePicture.toString("base64"), 'base64');
+  var img = Buffer.from(data.profilePicture.toString("base64"), "base64");
 
-  res.contentType('image/png');
+  res.contentType("image/png");
   res.send(img);
-})
+});
 app.listen(port, () => {
-  console.log(`HTTP server is listening on port `,port);
+  console.log(`HTTP server is listening on port `, port);
 });
