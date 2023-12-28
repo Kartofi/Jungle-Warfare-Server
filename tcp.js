@@ -12,6 +12,7 @@ const reload = require("./Utils/GameLogic/reload");
 
 server.on("connection", (socket) => {
   let name;
+  let playerId;
   let deviceId;
   let sessionId;
   let lobbyId;
@@ -27,7 +28,9 @@ server.on("connection", (socket) => {
     }
 
     if (json.type == "join") {
-      if (connectedPlayers.find((element) => element.name == json.name)) {
+      if (
+        connectedPlayers.find((element) => element.playerId == json.playerId)
+      ) {
         socket.write(
           JSON.stringify({
             type: "ExitGame",
@@ -37,7 +40,8 @@ server.on("connection", (socket) => {
         socket.destroy();
         return;
       }
-      name = json.request;
+      name = json.from;
+      playerId = json.playerId;
       deviceId = json.deviceId;
       sessionId = json.sessionId;
       lobbyId = json.lobbyId;
@@ -54,6 +58,7 @@ server.on("connection", (socket) => {
 
       connectedPlayers.push({
         name: name,
+        playerId: playerId,
         deviceId: deviceId,
         sessionId: sessionId,
         lobbyId: lobbyId,

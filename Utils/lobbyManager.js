@@ -51,7 +51,19 @@ function getPlayerUsingName(name) {
   });
   return found;
 }
-
+function getPlayerUsingId(id) {
+  var keys = Object.keys(lobbies);
+  let found = null;
+  keys.forEach((key) => {
+    let checkIfSessionIsIn = lobbies[key].players.find(
+      (element) => element.id == id
+    );
+    if (checkIfSessionIsIn != null) {
+      found = checkIfSessionIsIn;
+    }
+  });
+  return found;
+}
 function checkIfSessionIsIn(sessionId) {
   var keys = Object.keys(lobbies);
   let found = null;
@@ -113,7 +125,8 @@ function RemovePlayerUsingName(name) {
     });
   });
 }
-function RemoveNotUpdated() {
+
+function RemoveNotUpdated(broadcastFunction) {
   let time = new Date().getTime();
   var keys = Object.keys(lobbies);
 
@@ -124,7 +137,7 @@ function RemoveNotUpdated() {
         if (index > -1) {
           lobbies[lobby].players.splice(index, 1);
           console.log("Player: " + element.name + " lost connection!");
-          tcp.broadcast(
+          broadcastFunction(
             JSON.stringify({
               type: "sendMessage",
               from: "Server",
@@ -147,6 +160,7 @@ module.exports = {
   randomLobby,
   randomWeapon,
   getWeaponData,
+  getPlayerUsingId,
   getPlayerUsingName,
   checkIfSessionIsIn,
   checkIfDeviceIdIsIn,

@@ -10,7 +10,7 @@ async function Handle(json, info, broadcastFunction) {
   }
   let shooterInstance = lobbies[match].players.find(
     (element) =>
-      element.name == json.from &&
+      element.id == json.playerId &&
       element.deviceId == json.deviceId &&
       element.sessionId == json.sessionId
   );

@@ -12,7 +12,7 @@ const client = new MongoClient(
   }
 );
 const fs = require("fs");
-let sessionTimeOUt = 604800000;
+let sessionTimeOut = 604800000;
 let maxSessions = 5;
 
 async function connect() {
@@ -35,7 +35,6 @@ async function Login(name, password) {
   }
   let collection = client.db("Accounts").collection("Accounts");
   let player = await collection.findOne({ name: name, password: password });
-
   if (player != null) {
     let time = Date.now();
 
@@ -49,10 +48,12 @@ async function Login(name, password) {
       time: time,
     });
     sessions = sessions.filter(
-      (session) => session.time > time - sessionTimeOUt
+      (session) => session.time > time - sessionTimeOut
     );
 
     sessions.sort((item) => item.time);
+    sessions.reverse();
+
     if (sessions.length > maxSessions) {
       for (let i = 0; i < sessions.length - maxSessions; i++) {
         sessions.pop();
@@ -62,17 +63,22 @@ async function Login(name, password) {
       { name: name, password: password },
       { $set: { loginSessionIds: sessions } }
     );
-    return sessionId;
+    return { loginSessionId: sessionId, playerId: player.id };
   } else {
     return null;
   }
 }
-async function CheckSessionId(name, sessionId) {
+async function CheckSessionId(id, sessionId) {
   if (isConnected() == false) {
     return false;
   }
+  try {
+    id = Number(id);
+  } catch (e) {
+    return false;
+  }
   let collection = client.db("Accounts").collection("Accounts");
-  let player = await collection.findOne({ name: name });
+  let player = await collection.findOne({ id: id });
 
   if (player != null) {
     let sessionIdData = player.loginSessionIds.find(
@@ -80,9 +86,9 @@ async function CheckSessionId(name, sessionId) {
     );
     if (
       sessionIdData != null &&
-      Date.now() - sessionIdData.time < sessionTimeOUt
+      Date.now() - sessionIdData.time < sessionTimeOut
     ) {
-      return player.id;
+      return player.name;
     } else {
       return false;
     }
@@ -90,24 +96,26 @@ async function CheckSessionId(name, sessionId) {
     return false;
   }
 }
-async function LogOut(name, sessionId) {
+async function LogOut(id, sessionId) {
   if (isConnected() == false) {
     return false;
   }
+  try {
+    id = Number(id);
+  } catch (e) {
+    return false;
+  }
   let collection = client.db("Accounts").collection("Accounts");
-  let player = await collection.findOne({ name: name });
+  let player = await collection.findOne({ id: id });
 
   if (player != null) {
     let sessionIdData = player.loginSessionIds.find(
       (item) => item.id == sessionId
     );
     if (sessionIdData != null) {
-      player.loginSessionIds = player.loginSessionIds.filter(
-        (item) => item.id != sessionId
-      );
       await collection.updateOne(
-        { name: name },
-        { $set: { loginSessionIds: player.loginSessionIds } }
+        { id: id },
+        { $pull: { loginSessionIds: { id: sessionId } } }
       );
     }
     return true;

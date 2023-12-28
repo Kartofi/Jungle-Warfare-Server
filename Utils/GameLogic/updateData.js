@@ -19,7 +19,7 @@ function nameValidation(name, server) {
 }
 
 async function Update(json, server, info, broadcastFunction) {
-  let playerInstance = lobbyManager.getPlayerUsingName(json.name);
+  let playerInstance = lobbyManager.getPlayerUsingId(json.id);
 
   if (
     playerInstance &&
@@ -33,31 +33,26 @@ async function Update(json, server, info, broadcastFunction) {
     );
     return;
   }
-  if (nameValidation(json.name, server) == false) {
-    return;
-  }
 
   if (json.loginSessionId.length <= 0) {
     server.send(udpErrors.loginSessionIdTooShort, info.port, info.address);
     return;
   }
-
-  let playerId = 0;
-
+  let playerName = "";
   if (playerInstance == null) {
     if (mongoDB.isConnected() == false) {
       server.send(udpErrors.problemTryAgain, info.port, info.address);
       return;
     }
     let accountSessionCheck = await mongoDB.CheckSessionId(
-      json.name,
+      json.id,
       json.loginSessionId
     );
     if (accountSessionCheck == false) {
       server.send(udpErrors.wrongLoginSession, info.port, info.address);
       return;
     } else {
-      playerId = accountSessionCheck;
+      playerName = accountSessionCheck;
     }
   }
   if (json.versionHash != currentVersionHash) {
@@ -88,7 +83,7 @@ async function Update(json, server, info, broadcastFunction) {
       if (!lobbiesKeys.includes(lobby)) {
         lobbies[lobby] = {
           players: [],
-          creator: json.name,
+          creator: playerName,
           rules:
             !json.rules ||
             json.rules.weaponsRules.length < defaultWeaponsRules.length ||
@@ -111,11 +106,11 @@ async function Update(json, server, info, broadcastFunction) {
       server.send(udpErrors.lobbyIsFull, info.port, info.address);
       return;
     }
-    console.log("Player: " + json.name + " joined lobby:" + lobby + "!");
+    console.log("Player: " + playerName + " joined lobby:" + lobby + "!");
     let weapon = lobbyManager.randomWeapon(lobby);
     lobbies[lobby].players.push({
-      name: json.name,
-      id: playerId,
+      name: playerName,
+      id: json.id,
       deviceId: json.deviceId,
       sessionId: sessionId,
       lobbyId: lobby,
@@ -165,7 +160,7 @@ async function Update(json, server, info, broadcastFunction) {
       JSON.stringify({
         type: "sendMessage",
         from: "Server",
-        request: json.name + " joined the lobby.",
+        request: playerName + " joined the lobby.",
       }),
       lobby,
       null

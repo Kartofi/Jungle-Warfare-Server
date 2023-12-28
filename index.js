@@ -84,82 +84,14 @@ const lobbyManager = require("./Utils/lobbyManager");
 
 const disconnect = require("./Utils/GameLogic/disconnect");
 const shootIndicator = require("./Utils/GameLogic/shootIndicator");
+const shoot = require("./Utils/GameLogic/shoot");
 const bullets = require("./Utils/GameLogic/bullets");
 const updateData = require("./Utils/GameLogic/updateData");
 
-async function HandleShooting(json, info) {
-  let time = new Date().getTime();
-  try {
-    let match = lobbyManager.checkIfSessionIsIn(json.sessionId);
-    if (match == null) {
-      return;
-    }
-    let lobbyInstance = lobbies[match];
-    let shooterInstance = lobbyInstance.players.find(
-      (element) =>
-        element.name == json.name &&
-        element.deviceId == json.deviceId &&
-        element.sessionId == json.sessionId
-    );
-    let weaponData = lobbyManager.getWeaponData(shooterInstance.weapon, match);
-    let targetInstance = lobbyInstance.players.find(
-      (element) => element.name == json.secondName
-    );
-    if (
-      shooterInstance == null ||
-      targetInstance == null ||
-      shooterInstance.isDead == true ||
-      targetInstance.isDead == true ||
-      weaponData == null
-    ) {
-      return;
-    }
-
-    let distance = Vectors.subVectors(
-      Vectors.Vector3.fromJSON(targetInstance.position),
-      Vectors.Vector3.fromJSON(shooterInstance.position)
-    ).magnitude;
-    if (
-      distance <= weaponData.shootMaxDistance &&
-      time - shooterInstance.lastShoot > weaponData.shootCooldown * 1000 &&
-      shooterInstance.bullets > 0 &&
-      shooterInstance.reloading == false
-    ) {
-      targetInstance.health -= json.headShot
-        ? weaponData.damage * weaponData.headShotMultiplier
-        : weaponData.damage;
-      // take health
-
-      if (targetInstance.health <= 0) {
-        targetInstance.health = 0;
-        shooterInstance.kills++; // add kills
-        targetInstance.isDead = true;
-        tcp.broadcast(
-          JSON.stringify({
-            type: "kill",
-            from: shooterInstance.name,
-            to: targetInstance.name,
-            hit: json.positionHit,
-          }),
-          shooterInstance.lobbyId,
-          null
-        );
-        await Basic.Wait(lobbyInstance.rules.respawnTime);
-        let newWeapon = lobbyManager.randomWeapon(match);
-        targetInstance.isDead = false;
-        targetInstance.weapon = newWeapon.WeaponName;
-        targetInstance.health = lobbyInstance.rules.maxHealth;
-        targetInstance.bullets = newWeapon.bulletsMax;
-        targetInstance.position = rules.spawnPos.JsonObj;
-      }
-      shooterInstance.lastShoot = time;
-    }
-  } catch (error) {
-    console.log(error);
-  }
+function RemoveNotUpdatedCall() {
+  lobbyManager.RemoveNotUpdated(tcp.broadcast);
 }
-
-setInterval(lobbyManager.RemoveNotUpdated, 10000);
+setInterval(RemoveNotUpdatedCall, 10000);
 
 server.on("message", async (message, info) => {
   let json;
@@ -175,7 +107,7 @@ server.on("message", async (message, info) => {
     if (json.shootType == "shootIndicator") {
       shootIndicator.Handle(json, info, tcp.broadcast);
     } else if (json.shootType == "damageHit") {
-      HandleShooting(json, info);
+      shoot.Shoot(json, tcp.broadcast);
     }
   } else if (json.type == "keepAlive") {
     if (lobbyManager.checkIfSessionIsIn(json.sessionId) == false) {

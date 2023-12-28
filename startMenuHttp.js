@@ -43,23 +43,27 @@ app.post("/api/login", async (req, res) => {
     return;
   }
 
-  let loginSessionId = await mongoDB.Login(name, password);
-  if (loginSessionId == null) {
+  let loginData = await mongoDB.Login(name, password);
+  if (loginData == null) {
     res.send({ status: "unSuccessful" });
     return;
   }
-  res.send({ status: "Successful", loginSessionId: loginSessionId });
+  res.send({
+    status: "Successful",
+    playerId: loginData.playerId,
+    loginSessionId: loginData.loginSessionId,
+  });
 });
 app.post("/api/logout", async (req, res) => {
-  let name = req.body.name;
+  let id = req.body.id;
   let loginSessionId = req.body.loginSessionId;
 
-  if (!name || !loginSessionId) {
+  if (!id || !loginSessionId) {
     res.send({ status: "unSuccessful" });
     return;
   }
 
-  let logOutSuccessful = await mongoDB.LogOut(name, loginSessionId);
+  let logOutSuccessful = await mongoDB.LogOut(id, loginSessionId);
   if (logOutSuccessful == false) {
     res.send({ status: "unSuccessful" });
     return;
@@ -67,10 +71,11 @@ app.post("/api/logout", async (req, res) => {
   res.send({ status: "Successful" });
 });
 app.post("/api/sessionLogin", async (req, res) => {
-  let name = req.body.name;
+  let id = req.body.id;
   let loginSessionId = req.body.loginSessionId;
   let versionHash = req.body.versionHash;
-  if (!name || !loginSessionId) {
+
+  if (!id || !loginSessionId) {
     res.send({ status: "unSuccessful" });
     return;
   }
@@ -79,7 +84,7 @@ app.post("/api/sessionLogin", async (req, res) => {
     return;
   }
 
-  let correct = await mongoDB.CheckSessionId(name, loginSessionId);
+  let correct = await mongoDB.CheckSessionId(id, loginSessionId);
   if (correct == false) {
     res.send({ status: "unSuccessful" });
     return;
