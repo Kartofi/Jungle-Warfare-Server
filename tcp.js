@@ -7,6 +7,7 @@ let connectedPlayers = [];
 var moderateText = require("./Utils/moderateText");
 const Basic = require("./Utils/Basic");
 const lobbyManager = require("./Utils/lobbyManager");
+const gzipManager = require("./Utils/GZipManager");
 
 const reload = require("./Utils/GameLogic/reload");
 
@@ -19,11 +20,14 @@ server.on("connection", (socket) => {
 
   socket.setKeepAlive(true, 10000);
 
-  socket.on("data", (receiveData) => {
+  socket.on("data", async (receiveData) => {
     let json;
+    json = receiveData.toString("base64");
     try {
-      json = JSON.parse(receiveData.toString());
+      json = await gzipManager.Decompress(json);
+      json = JSON.parse(json);
     } catch (e) {
+      console.log(e);
       return;
     }
 
@@ -51,7 +55,9 @@ server.on("connection", (socket) => {
           type: "ExitGame",
           request: "Lobby is not available : " + json.lobbyId,
         });
-        socket.write(dataToSend.length + "@" + dataToSend);
+        socket.write(
+          gzipManager.Compress(dataToSend.length + "@" + dataToSend)
+        );
         socket.destroy();
         return;
       }
@@ -84,29 +90,32 @@ server.on("connection", (socket) => {
     }
   });
   socket.on("close", () => {
-    removePlayer(name, deviceId, sessionId);
+    removePlayer(playerId, deviceId, sessionId);
   });
   socket.on("end", () => {
-    removePlayer(name, deviceId, sessionId);
+    removePlayer(playerId, deviceId, sessionId);
   });
   socket.on("error", (error) => {
-    removePlayer(name, deviceId, sessionId);
+    removePlayer(playerId, deviceId, sessionId);
   });
 });
 
 function broadcast(message, lobbyId, senderSocket) {
+  let writeData = gzipManager.Compress(
+    "\0" + message.length + "\u0007" + message
+  );
   connectedPlayers.forEach((client) => {
     // Don't send the message back to the sender
     if (client.socket !== senderSocket && client.lobbyId == lobbyId) {
-      client.socket.write("\0" + message.length + "\u0007" + message);
+      client.socket.write(writeData);
     }
   });
 }
 
-function removePlayer(name, deviceId, sessionId) {
+function removePlayer(playerId, deviceId, sessionId) {
   const playerInstance = connectedPlayers.find(
     (element) =>
-      element.name == name &&
+      element.id == playerId &&
       element.deviceId == deviceId &&
       element.sessionId == sessionId
   );

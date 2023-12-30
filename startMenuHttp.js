@@ -3,11 +3,12 @@ const fs = require("fs");
 
 const app = express();
 var bodyParser = require("body-parser");
+var compression = require('compression')
 
 const port = 2223;
 
 const mongoDB = require("./Utils/MongoDBManager");
-
+app.use(compression())
 app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(
   bodyParser.urlencoded({

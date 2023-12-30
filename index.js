@@ -7,6 +7,7 @@ const Basic = require("./Utils/Basic");
 const AntiCheat = require("./Utils/AntiCheat");
 const mongoDB = require("./Utils/MongoDBManager");
 const udpErrors = require("./Utils/udpErrors");
+const gzipManager = require("./Utils/GZipManager");
 
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
@@ -87,17 +88,24 @@ const shootIndicator = require("./Utils/GameLogic/shootIndicator");
 const shoot = require("./Utils/GameLogic/shoot");
 const bullets = require("./Utils/GameLogic/bullets");
 const updateData = require("./Utils/GameLogic/updateData");
+const keepAlive = require("./Utils/GameLogic/keepAlive");
 
 function RemoveNotUpdatedCall() {
   lobbyManager.RemoveNotUpdated(tcp.broadcast);
+}
+function SendCompress(json, port, ip) {
+  server.send(gzipManager.Compress(json), port, ip);
 }
 setInterval(RemoveNotUpdatedCall, 10000);
 
 server.on("message", async (message, info) => {
   let json;
+  json = message.toString("base64");
   try {
-    json = JSON.parse(message.toString());
+    json = await gzipManager.Decompress(json);
+    json = JSON.parse(json);
   } catch (e) {
+    console.log(e);
     return;
   }
   if (json.type == "disconnect") {
@@ -110,32 +118,15 @@ server.on("message", async (message, info) => {
       shoot.Shoot(json, tcp.broadcast);
     }
   } else if (json.type == "keepAlive") {
-    if (lobbyManager.checkIfSessionIsIn(json.sessionId) == false) {
-      return;
-    }
-    let time = new Date().getTime();
-    let player = lobbyManager.getPlayerUsingName(json.name);
-    if (!player || time - player.lastUpdate < rules.updateDelay) {
-      return;
-    }
-    player.lastUpdate = time;
-    player.state = json.state;
-    player.ping = Basic.Clamp(json.ping, 0, 999);
-    const players = lobbies[player.lobbyId].players.map(
-      ({ ip, deviceId, sessionId, lastUpdate, lastShoot, ...rest }) => rest
-    );
-    server.send(JSON.stringify({ players: players }), info.port, info.address);
+    keepAlive.Handle(json, info, server);
   } else if (json.type == "ping") {
     if (lobbyManager.checkIfSessionIsIn(json.sessionId) == false) {
       return;
     }
-    server.send(
-      JSON.stringify({
-        type: "pong",
-      }),
-      info.port,
-      info.address
-    );
+    let dataToSend = JSON.stringify({
+      type: "pong",
+    });
+    SendCompress(dataToSend, info.port, info.address);
   } else {
     updateData.Update(json, server, info, tcp.broadcast);
   }

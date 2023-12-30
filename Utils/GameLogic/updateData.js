@@ -4,20 +4,13 @@ const AntiCheat = require("../AntiCheat");
 const Vectors = require("../Vectors");
 const mongoDB = require("../MongoDBManager");
 const udpErrors = require("../udpErrors");
+const gzipManager = require("../GZipManager");
 
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
-function nameValidation(name, server) {
-  if (name.length <= 0) {
-    server.send(udpErrors.nameTooShort, info.port, info.address);
-    return false;
-  } else if (name.length > 20) {
-    server.send(udpErrors.nameTooLong, info.port, info.address);
-    return false;
-  }
-  return true;
+function sendData(json, server, info) {
+  server.send(gzipManager.Compress(json), info.port, info.address);
 }
-
 async function Update(json, server, info, broadcastFunction) {
   let playerInstance = lobbyManager.getPlayerUsingId(json.id);
 
@@ -26,22 +19,19 @@ async function Update(json, server, info, broadcastFunction) {
     (playerInstance.sessionId != json.sessionId ||
       playerInstance.deviceId != json.deviceId)
   ) {
-    server.send(
-      udpErrors.accountLoggedFromAnotherLocation,
-      info.port,
-      info.address
-    );
+    sendData(udpErrors.accountLoggedFromAnotherLocation, server, info);
+
     return;
   }
 
   if (json.loginSessionId.length <= 0) {
-    server.send(udpErrors.loginSessionIdTooShort, info.port, info.address);
+    sendData(udpErrors.loginSessionIdTooShort, server, info);
     return;
   }
   let playerName = "";
   if (playerInstance == null) {
     if (mongoDB.isConnected() == false) {
-      server.send(udpErrors.problemTryAgain, info.port, info.address);
+      sendData(udpErrors.problemTryAgain, server, info);
       return;
     }
     let accountSessionCheck = await mongoDB.CheckSessionId(
@@ -49,14 +39,14 @@ async function Update(json, server, info, broadcastFunction) {
       json.loginSessionId
     );
     if (accountSessionCheck == false) {
-      server.send(udpErrors.wrongLoginSession, info.port, info.address);
+      sendData(udpErrors.wrongLoginSession, server, info);
       return;
     } else {
       playerName = accountSessionCheck;
     }
   }
   if (json.versionHash != currentVersionHash) {
-    server.send(udpErrors.outDatedClient, info.port, info.address);
+    sendData(udpErrors.outDatedClient, server, info);
     return;
   }
 
@@ -67,7 +57,7 @@ async function Update(json, server, info, broadcastFunction) {
       //lobbyManager.checkIfDeviceIdIsIn(json.deviceId) != null
       json.sessionId
     ) {
-      server.send(udpErrors.problemRejoin, info.port, info.address);
+      sendData(udpErrors.problemRejoin, server, info);
       return;
     }
 
@@ -103,7 +93,7 @@ async function Update(json, server, info, broadcastFunction) {
     }
     if (lobbies[lobby].rules.lobbySize == lobbies[lobby].players.length) {
       // check if lobby is full
-      server.send(udpErrors.lobbyIsFull, info.port, info.address);
+      sendData(udpErrors.lobbyIsFull, server, info);
       return;
     }
     console.log("Player: " + playerName + " joined lobby:" + lobby + "!");
@@ -120,7 +110,7 @@ async function Update(json, server, info, broadcastFunction) {
       health: lobbies[lobby].rules.maxHealth,
       bullets: weapon == null ? 0 : weapon.bulletsMax,
       isDead: false,
-      state: "idle",
+      state: 0,
       kills: 0,
       CameraData: json.CameraData
         ? json.CameraData
@@ -140,22 +130,19 @@ async function Update(json, server, info, broadcastFunction) {
       ({ ip, deviceId, sessionId, lastUpdate, lastShoot, lobbyId, ...rest }) =>
         rest
     );
-
-    server.send(
-      JSON.stringify({
-        type: "position",
-        reason: "startPos",
-        correctPosition: rules.spawnPos.JsonObj,
-        sessionId: sessionId,
-        lobbyId: lobby,
-        rules: Object.assign({}, lobbies[lobby].rules, {
-          maxMoveDistance: rules.maxMoveDistance,
-        }),
-        players: players,
+    let dataToSend = JSON.stringify({
+      type: "position",
+      reason: "startPos",
+      correctPosition: rules.spawnPos.JsonObj,
+      sessionId: sessionId,
+      lobbyId: lobby,
+      rules: Object.assign({}, lobbies[lobby].rules, {
+        maxMoveDistance: rules.maxMoveDistance,
       }),
-      info.port,
-      info.address
-    );
+      players: players,
+    });
+    sendData(dataToSend, server, info);
+
     broadcastFunction(
       JSON.stringify({
         type: "sendMessage",
@@ -189,16 +176,14 @@ async function Update(json, server, info, broadcastFunction) {
           ...rest
         }) => rest
       );
-      server.send(
-        JSON.stringify({
-          type: "position",
-          reason: "hacker",
-          correctPosition: playerInstance.position,
-          players: players,
-        }),
-        info.port,
-        info.address
-      );
+      let dataToSend = JSON.stringify({
+        type: "position",
+        reason: "hacker",
+        correctPosition: playerInstance.position,
+        players: players,
+      });
+      sendData(dataToSend, server, info);
+
       return;
     }
   }
@@ -209,13 +194,10 @@ async function Update(json, server, info, broadcastFunction) {
     ({ ip, deviceId, sessionId, lastUpdate, lastShoot, lobbyId, ...rest }) =>
       rest
   );
-  server.send(
-    JSON.stringify({
-      players: players,
-      rules: lobbies[playerInstance.lobbyId].rules,
-    }),
-    info.port,
-    info.address
-  );
+  let dataToSend = JSON.stringify({
+    players: players,
+    rules: lobbies[playerInstance.lobbyId].rules,
+  });
+  sendData(dataToSend, server, info);
 }
 module.exports = { Update };
