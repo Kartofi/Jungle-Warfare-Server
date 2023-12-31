@@ -54,6 +54,8 @@ async function Shoot(json, broadcastFunction) {
             type: "kill",
             from: shooterInstance.name,
             to: targetInstance.name,
+            fromId: shooterInstance.id,
+            toId: targetInstance.id,
             hit: json.positionHit,
           }),
           shooterInstance.lobbyId,

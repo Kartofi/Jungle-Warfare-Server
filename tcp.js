@@ -10,7 +10,9 @@ const lobbyManager = require("./Utils/lobbyManager");
 const gzipManager = require("./Utils/GZipManager");
 
 const reload = require("./Utils/GameLogic/reload");
-
+function formatStringToSend(data) {
+  return "\0" + data.length + "\u0007" + data;
+}
 server.on("connection", (socket) => {
   let name;
   let playerId;
@@ -35,12 +37,12 @@ server.on("connection", (socket) => {
       if (
         connectedPlayers.find((element) => element.playerId == json.playerId)
       ) {
-        socket.write(
-          JSON.stringify({
-            type: "ExitGame",
-            request: "Account logged from another location.",
-          })
-        );
+        console.log(123);
+        let dataToSend = JSON.stringify({
+          type: "ExitGame",
+          request: "Account logged from another location.",
+        });
+        socket.write(gzipManager.Compress(formatStringToSend(dataToSend)));
         socket.destroy();
         return;
       }
@@ -55,9 +57,7 @@ server.on("connection", (socket) => {
           type: "ExitGame",
           request: "Lobby is not available : " + json.lobbyId,
         });
-        socket.write(
-          gzipManager.Compress(dataToSend.length + "@" + dataToSend)
-        );
+        socket.write(gzipManager.Compress(formatStringToSend(dataToSend)));
         socket.destroy();
         return;
       }
@@ -87,6 +87,12 @@ server.on("connection", (socket) => {
       broadcast(JSON.stringify(json), lobbyId, null);
     } else if (json.type == "reload") {
       reload.Reload(json, broadcast);
+    } else if (json.type == "keepAlive") {
+      socket.write(
+        gzipManager.Compress(
+          formatStringToSend(JSON.stringify({ type: "keepAlive" }))
+        )
+      );
     }
   });
   socket.on("close", () => {
@@ -101,9 +107,7 @@ server.on("connection", (socket) => {
 });
 
 function broadcast(message, lobbyId, senderSocket) {
-  let writeData = gzipManager.Compress(
-    "\0" + message.length + "\u0007" + message
-  );
+  let writeData = gzipManager.Compress(formatStringToSend(message));
   connectedPlayers.forEach((client) => {
     // Don't send the message back to the sender
     if (client.socket !== senderSocket && client.lobbyId == lobbyId) {
@@ -113,16 +117,12 @@ function broadcast(message, lobbyId, senderSocket) {
 }
 
 function removePlayer(playerId, deviceId, sessionId) {
-  const playerInstance = connectedPlayers.find(
-    (element) =>
-      element.id == playerId &&
-      element.deviceId == deviceId &&
-      element.sessionId == sessionId
+  connectedPlayers = connectedPlayers.filter(
+    (player) =>
+      player.id == playerId &&
+      player.deviceId == deviceId &&
+      player.sessionId == sessionId
   );
-  const indexPlayer = connectedPlayers.indexOf(playerInstance);
-  if (indexPlayer !== -1) {
-    connectedPlayers.splice(indexPlayer, 1);
-  }
 }
 server.listen(2222, function () {
   console.log("TCP server is listening on port ", 2222);

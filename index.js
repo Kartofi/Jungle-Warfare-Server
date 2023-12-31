@@ -66,7 +66,7 @@ global.defaultRulesForPlayer = {
 
   weaponsRules: defaultWeaponsRules,
 };
-global.lobbies = {};
+global.lobbies = {lobby1: {players:[],rules:defaultRulesForPlayer,creator:"123"}};
 
 //Game AntiCheat Properties
 global.rules = {

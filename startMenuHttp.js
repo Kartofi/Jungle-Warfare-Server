@@ -90,7 +90,7 @@ app.post("/api/sessionLogin", async (req, res) => {
     res.send({ status: "unSuccessful" });
     return;
   }
-  res.send({ status: "Successful" });
+  res.send({ status: "Successful", playerName:correct });
 });
 app.get("/user/:id", async (req, res) => {
   let id = req.params.id;

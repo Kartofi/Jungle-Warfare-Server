@@ -40,7 +40,7 @@ async function Login(name, password) {
 
     let sessionId = crypto
       .createHash("md5")
-      .update(name + "-" + time * crypto.randomInt(100))
+      .update(player.id + "-" + time * crypto.randomInt(100))
       .digest("hex");
     let sessions = player.loginSessionIds == null ? [] : player.loginSessionIds;
     sessions.push({
