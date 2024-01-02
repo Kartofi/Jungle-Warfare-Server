@@ -20,13 +20,10 @@ server.on("connection", (socket) => {
   let sessionId;
   let lobbyId;
 
-  socket.setKeepAlive(true, 10000);
-
   socket.on("data", async (receiveData) => {
     let json;
-    json = receiveData.toString("base64");
+    json = receiveData.toString("utf-8");
     try {
-      json = await gzipManager.Decompress(json);
       json = JSON.parse(json);
     } catch (e) {
       console.log(e);
@@ -37,12 +34,11 @@ server.on("connection", (socket) => {
       if (
         connectedPlayers.find((element) => element.playerId == json.playerId)
       ) {
-        console.log(123);
         let dataToSend = JSON.stringify({
           type: "ExitGame",
           request: "Account logged from another location.",
         });
-        socket.write(gzipManager.Compress(formatStringToSend(dataToSend)));
+        socket.write(formatStringToSend(dataToSend));
         socket.destroy();
         return;
       }
@@ -57,7 +53,7 @@ server.on("connection", (socket) => {
           type: "ExitGame",
           request: "Lobby is not available : " + json.lobbyId,
         });
-        socket.write(gzipManager.Compress(formatStringToSend(dataToSend)));
+        socket.write(formatStringToSend(dataToSend));
         socket.destroy();
         return;
       }
@@ -88,26 +84,23 @@ server.on("connection", (socket) => {
     } else if (json.type == "reload") {
       reload.Reload(json, broadcast);
     } else if (json.type == "keepAlive") {
-      socket.write(
-        gzipManager.Compress(
-          formatStringToSend(JSON.stringify({ type: "keepAlive" }))
-        )
-      );
+      socket.write(formatStringToSend(JSON.stringify({ type: "keepAlive" })));
     }
   });
   socket.on("close", () => {
-    removePlayer(playerId, deviceId, sessionId);
+    removePlayer(playerId);
   });
   socket.on("end", () => {
-    removePlayer(playerId, deviceId, sessionId);
+    removePlayer(playerId);
   });
   socket.on("error", (error) => {
-    removePlayer(playerId, deviceId, sessionId);
+    console.log(error);
+    removePlayer(playerId);
   });
 });
 
 function broadcast(message, lobbyId, senderSocket) {
-  let writeData = gzipManager.Compress(formatStringToSend(message));
+  let writeData = formatStringToSend(message);
   connectedPlayers.forEach((client) => {
     // Don't send the message back to the sender
     if (client.socket !== senderSocket && client.lobbyId == lobbyId) {
@@ -116,12 +109,9 @@ function broadcast(message, lobbyId, senderSocket) {
   });
 }
 
-function removePlayer(playerId, deviceId, sessionId) {
+function removePlayer(playerId) {
   connectedPlayers = connectedPlayers.filter(
-    (player) =>
-      player.id == playerId &&
-      player.deviceId == deviceId &&
-      player.sessionId == sessionId
+    (player) => player.playerId == playerId
   );
 }
 server.listen(2222, function () {

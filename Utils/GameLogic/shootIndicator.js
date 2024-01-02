@@ -34,7 +34,7 @@ async function Handle(json, info, broadcastFunction) {
   broadcastFunction(
     JSON.stringify({
       type: "shootIndicator",
-      from: json.from,
+      fromId: json.playerId,
       hit: json.hit,
       hitColor: json.hitColor,
       playerHit: json.playerHit,

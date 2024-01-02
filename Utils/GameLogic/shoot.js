@@ -18,7 +18,7 @@ async function Shoot(json, broadcastFunction) {
     );
     let weaponData = lobbyManager.getWeaponData(shooterInstance.weapon, match);
     let targetInstance = lobbyInstance.players.find(
-      (element) => element.name == json.secondName
+      (element) => element.id == json.secondId
     );
     if (
       shooterInstance == null ||
@@ -52,8 +52,6 @@ async function Shoot(json, broadcastFunction) {
         broadcastFunction(
           JSON.stringify({
             type: "kill",
-            from: shooterInstance.name,
-            to: targetInstance.name,
             fromId: shooterInstance.id,
             toId: targetInstance.id,
             hit: json.positionHit,

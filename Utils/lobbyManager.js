@@ -106,7 +106,24 @@ function checkIfNameIsIn(name) {
   });
   return found;
 }
+function RemovePlayerUsingId(id) {
+  var keys = Object.keys(lobbies);
 
+  keys.forEach((match) => {
+    lobbies[match].players.forEach((element) => {
+      if (element && element.id == id) {
+        var index = lobbies[match].players.indexOf(element);
+        if (index > -1) {
+          lobbies[match].players.splice(index, 1);
+          if (lobbies[match].players.length <= 0) {
+            delete lobbies[match];
+            console.log("Removed match :" + match);
+          }
+        }
+      }
+    });
+  });
+}
 function RemovePlayerUsingName(name) {
   var keys = Object.keys(lobbies);
 
@@ -166,5 +183,6 @@ module.exports = {
   checkIfDeviceIdIsIn,
   checkIfNameIsIn,
   RemovePlayerUsingName,
+  RemovePlayerUsingId,
   RemoveNotUpdated,
 };

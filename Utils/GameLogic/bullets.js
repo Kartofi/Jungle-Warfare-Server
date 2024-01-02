@@ -8,7 +8,7 @@ async function Handle(json, info) {
   }
   let shooterInstance = lobbies[lobby].players.find(
     (element) =>
-      element.name == json.from &&
+      element.id == json.playerId &&
       element.deviceId == json.deviceId &&
       element.sessionId == json.sessionId &&
       element.ip == info.address

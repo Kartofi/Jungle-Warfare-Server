@@ -9,14 +9,12 @@ async function Reload(json, broadcastFunction) {
   }
   let playerInstance = lobbies[lobby].players.find(
     (element) =>
-      element.name == json.name &&
+      element.id == json.playerId &&
       element.deviceId == json.deviceId &&
       element.sessionId == json.sessionId
   );
-  let weaponData = await lobbyManager.getWeaponData(
-    playerInstance.weapon,
-    lobby
-  );
+
+  let weaponData = lobbyManager.getWeaponData(playerInstance.weapon, lobby);
   if (playerInstance == null || weaponData == null) {
     return;
   }
@@ -26,7 +24,7 @@ async function Reload(json, broadcastFunction) {
   ) {
     playerInstance.reloading = true;
     broadcastFunction(
-      JSON.stringify({ type: "reload", from: playerInstance.name }),
+      JSON.stringify({ type: "reload", fromId: playerInstance.id }),
       lobby,
       null
     );
