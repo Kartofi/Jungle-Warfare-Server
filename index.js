@@ -111,7 +111,10 @@ server.on("message", async (message, info) => {
     return;
   }
   if (json.type == "disconnect") {
-    disconnect.Disconnect(json, info, tcp.broadcast);
+    let valid = await disconnect.Disconnect(json, info, tcp.broadcast);
+    if (valid == true){
+      //tcp.removePlayer(json.playerId)
+    }
   } else if (json.type == "shoot") {
     bullets.Handle(json, info);
     if (json.shootType == "shootIndicator") {

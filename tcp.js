@@ -14,7 +14,6 @@ function formatStringToSend(data) {
   return "\0" + data.length + "\u0007" + data;
 }
 server.on("connection", (socket) => {
-  let name;
   let playerId;
   let deviceId;
   let sessionId;
@@ -29,10 +28,13 @@ server.on("connection", (socket) => {
       console.log(e);
       return;
     }
-
     if (json.type == "join") {
       if (
-        connectedPlayers.find((element) => element.playerId == json.playerId)
+        connectedPlayers.find(
+          (element) =>
+            element.playerId == json.playerId &&
+            element.sessionId == json.sessionId
+        )
       ) {
         let dataToSend = JSON.stringify({
           type: "ExitGame",
@@ -42,7 +44,6 @@ server.on("connection", (socket) => {
         socket.destroy();
         return;
       }
-      name = json.from;
       playerId = json.playerId;
       deviceId = json.deviceId;
       sessionId = json.sessionId;
@@ -59,7 +60,6 @@ server.on("connection", (socket) => {
       }
 
       connectedPlayers.push({
-        name: name,
         playerId: playerId,
         deviceId: deviceId,
         sessionId: sessionId,
@@ -69,7 +69,7 @@ server.on("connection", (socket) => {
     } else if (json.type == "sendMessage") {
       if (
         json.request === "\n" ||
-        json.from !== name ||
+        json.fromId !== playerId ||
         json.deviceId !== deviceId ||
         json.sessionId !== sessionId ||
         json.lobbyId !== lobbyId ||
@@ -88,19 +88,19 @@ server.on("connection", (socket) => {
     }
   });
   socket.on("close", () => {
-    removePlayer(playerId);
+    removePlayer(playerId, sessionId, lobbyId);
   });
   socket.on("end", () => {
-    removePlayer(playerId);
+    removePlayer(playerId, sessionId, lobbyId);
   });
   socket.on("error", (error) => {
     console.log(error);
-    removePlayer(playerId);
+    removePlayer(playerId, sessionId, lobbyId);
   });
 });
 
 function broadcast(message, lobbyId, senderSocket) {
-  let writeData = formatStringToSend(message);
+  let writeData = formatStringToSend(message).toString("utf-8");
   connectedPlayers.forEach((client) => {
     // Don't send the message back to the sender
     if (client.socket !== senderSocket && client.lobbyId == lobbyId) {
@@ -109,13 +109,17 @@ function broadcast(message, lobbyId, senderSocket) {
   });
 }
 
-function removePlayer(playerId) {
+function removePlayer(playerId, sessionId, lobbyId) {
   connectedPlayers = connectedPlayers.filter(
-    (player) => player.playerId == playerId
+    (player) =>
+      player.playerId !== playerId ||
+      player.sessionId !== sessionId ||
+      player.lobbyId !== lobbyId
   );
 }
+
 server.listen(2222, function () {
   console.log("TCP server is listening on port ", 2222);
 });
 
-module.exports = { broadcast };
+module.exports = { broadcast, removePlayer };

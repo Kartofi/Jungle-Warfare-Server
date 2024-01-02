@@ -16,13 +16,14 @@ async function Disconnect(json, info, broadcastFunction) {
     broadcastFunction(
       JSON.stringify({
         type: "sendMessage",
-        from: "Server",
+        fromId: -1,
         request: playerInstance.name + " left the lobby.",
       }),
       playerInstance.lobbyId,
       null
     );
     lobbyManager.RemovePlayerUsingId(json.playerId);
+    return true;
   }
 }
 module.exports = { Disconnect };
