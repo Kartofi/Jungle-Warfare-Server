@@ -20,7 +20,7 @@ function randomWeapon(lobby) {
   if (lobbies[lobby] == null) {
     return;
   }
-  return lobbies[lobby].rules.weaponsRules[1];
+  return lobbies[lobby].rules.weaponsRules[0];
 }
 function getWeaponData(name, lobby) {
   if (lobbies[lobby] == null) {

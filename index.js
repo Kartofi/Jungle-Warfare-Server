@@ -67,7 +67,7 @@ global.defaultRulesForPlayer = {
   weaponsRules: defaultWeaponsRules,
 };
 global.lobbies = {
-  lobby1: { players: [], rules: defaultRulesForPlayer, creator: "123" },
+
 };
 
 //Game AntiCheat Properties
@@ -111,13 +111,10 @@ server.on("message", async (message, info) => {
     return;
   }
   if (json.type == "disconnect") {
-    let valid = await disconnect.Disconnect(json, info, tcp.broadcast);
-    if (valid == true){
-      //tcp.removePlayer(json.playerId)
-    }
+    disconnect.Disconnect(json, info, tcp.broadcast);
   } else if (json.type == "shoot") {
-    bullets.Handle(json, info);
     if (json.shootType == "shootIndicator") {
+      bullets.Handle(json, info);
       shootIndicator.Handle(json, info, tcp.broadcast);
     } else if (json.shootType == "damageHit") {
       shoot.Shoot(json, tcp.broadcast);

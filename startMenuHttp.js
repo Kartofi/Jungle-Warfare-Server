@@ -3,12 +3,12 @@ const fs = require("fs");
 
 const app = express();
 var bodyParser = require("body-parser");
-var compression = require('compression')
+var compression = require("compression");
 
 const port = 2223;
 
 const mongoDB = require("./Utils/MongoDBManager");
-app.use(compression())
+app.use(compression());
 app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(
   bodyParser.urlencoded({
@@ -24,6 +24,7 @@ app.get("/api/lobbies", (req, res) => {
     dataPlayers.push({
       name: key,
       creator: lobbies[key].creator,
+      creatorId: lobbies[key].creatorId,
       players: lobbies[key].players.length,
       lobbySize: lobbies[key].rules.lobbySize,
     });
@@ -90,7 +91,7 @@ app.post("/api/sessionLogin", async (req, res) => {
     res.send({ status: "unSuccessful" });
     return;
   }
-  res.send({ status: "Successful", playerName:correct });
+  res.send({ status: "Successful", playerName: correct });
 });
 app.get("/user/:id", async (req, res) => {
   let id = req.params.id;

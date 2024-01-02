@@ -74,6 +74,7 @@ async function Update(json, server, info, broadcastFunction) {
         lobbies[lobby] = {
           players: [],
           creator: playerName,
+          creatorId: json.id,
           rules:
             !json.rules ||
             json.rules.weaponsRules.length < defaultWeaponsRules.length ||
@@ -196,6 +197,8 @@ async function Update(json, server, info, broadcastFunction) {
   );
   let dataToSend = JSON.stringify({
     players: players,
+    creator: lobbies[playerInstance.lobbyId].creator,
+    creatorId: lobbies[playerInstance.lobbyId].creatorId,
     rules: lobbies[playerInstance.lobbyId].rules,
   });
   sendData(dataToSend, server, info);
