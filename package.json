@@ -15,6 +15,7 @@
     "dgram": "^1.0.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "jsonschema": "^1.4.1",
     "leo-profanity": "^1.7.0",
     "mongodb": "^6.1.0",
     "uuid": "^9.0.1",

@@ -1,0 +1,317 @@
+{
+  "update": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "id": {
+        "type": "integer"
+      },
+      "versionHash": {
+        "type": "string",
+        "minLength": 1
+      },
+      "loginSessionId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "deviceId": {
+        "type": "string"
+      },
+      "sessionId": {
+        "type": "string"
+      },
+      "lobbyId": {
+        "type": "string"
+      },
+      "ping": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 999
+      },
+      "bullets": {
+        "type": "integer"
+      },
+      "rules": {
+        "type": "object"
+      },
+      "CameraData": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "z": {
+                "type": "number"
+              }
+            },
+            "required": ["x", "y", "z"]
+          },
+          "rotation": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "z": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "required": ["position"]
+      }
+    },
+    "required": [
+      "id",
+      "versionHash",
+      "loginSessionId",
+      "deviceId",
+      "ping",
+      "CameraData"
+    ]
+  },
+  "shootIndicator": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "description": "user name",
+        "minLength": 1
+      },
+      "playerId": {
+        "type": "integer"
+      },
+      "deviceId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "sessionId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "lobbyId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "hit": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          }
+        }
+      },
+      "hitColor": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "type": "number"
+          },
+          "g": {
+            "type": "number"
+          },
+          "b": {
+            "type": "number"
+          }
+        }
+      },
+      "emissionIntensity": {
+        "type": "number"
+      },
+      "playerHit": {
+        "type": "boolean"
+      },
+      "shootType": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": [
+      "type",
+      "playerId",
+      "deviceId",
+      "sessionId",
+      "lobbyId",
+      "playerHit",
+      "shootType"
+    ]
+  },
+  "damageHit": {
+    "type": "object",
+    "properties": {
+      "playerId": {
+        "type": "integer"
+      },
+      "deviceId": {
+        "type": "string"
+      },
+      "sessionId": {
+        "type": "string"
+      },
+      "shootType": {
+        "type": "string",
+        "minLength": 1
+      },
+      "secondId": {
+        "type": "integer"
+      },
+      "positionHit": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          }
+        }
+      },
+      "headShot": {
+        "type": "boolean"
+      },
+      "type": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "playerId",
+      "deviceId",
+      "sessionId",
+      "shootType",
+      "secondId",
+      "headShot",
+      "type"
+    ]
+  },
+  "reload": {
+    "type": "object",
+    "properties": {
+      "playerId": {
+        "type": "integer"
+      },
+      "deviceId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "sessionId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "type": {
+        "type": "string"
+      }
+    },
+    "required": ["playerId", "deviceId", "sessionId", "type"]
+  },
+  "keepAlive": {
+    "type": "object",
+    "properties": {
+      "playerId": {
+        "type": "integer"
+      },
+      "sessionId": {
+        "type": "string"
+      }
+    },
+    "required": ["playerId", "sessionId"]
+  },
+  "disconnect": {
+    "type": "object",
+    "properties": {
+      "playerId": {
+        "type": "integer"
+      },
+      "sessionId": {
+        "type": "string"
+      },
+      "deviceId": {
+        "type": "string"
+      }
+    },
+    "required": ["playerId", "sessionId", "deviceId"]
+  },
+  "tcpJoin": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "minLength": 1
+      },
+      "playerId": {
+        "type": "integer"
+      },
+      "deviceId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "sessionId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "lobbyId": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": ["type", "playerId", "deviceId", "sessionId", "lobbyId"]
+  },
+  "tcpChatMessage": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "type": {
+        "type": "string"
+      },
+      "playerId": {
+        "type": "integer"
+      },
+      "sessionId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "deviceId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "lobbyId": {
+        "type": "string"
+      },
+      "fromId": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "request",
+      "type",
+      "playerId",
+      "sessionId",
+      "deviceId",
+      "lobbyId",
+      "fromId"
+    ]
+  }
+}

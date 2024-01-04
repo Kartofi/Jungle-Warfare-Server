@@ -1,7 +1,13 @@
 const Basic = require("../Basic");
 const lobbyManager = require("../lobbyManager");
+const validateJsonInput = require("../validateJsonInput");
 
 async function Reload(json, broadcastFunction) {
+  let validJson = validateJsonInput.ValidateReload(json);
+  if (validJson == false) {
+    return;
+  }
+
   let time = new Date().getTime();
   let lobby = lobbyManager.checkIfSessionIsIn(json.sessionId);
   if (lobby == null) {

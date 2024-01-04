@@ -8,6 +8,7 @@ var moderateText = require("./Utils/moderateText");
 const Basic = require("./Utils/Basic");
 const lobbyManager = require("./Utils/lobbyManager");
 const gzipManager = require("./Utils/GZipManager");
+const validateJsonInput = require("./Utils/validateJsonInput");
 
 const reload = require("./Utils/GameLogic/reload");
 function formatStringToSend(data) {
@@ -25,20 +26,41 @@ server.on("connection", (socket) => {
     try {
       json = JSON.parse(json);
     } catch (e) {
+      console.log(json);
       console.log(e);
       return;
     }
     if (json.type == "join") {
+      let validJson = validateJsonInput.ValidateTcpJoin(json);
+      if (validJson == false) {
+        let dataToSend = JSON.stringify({
+          type: "ExitGame",
+          request: "There was a problem, please try again later!",
+        });
+        socket.write(formatStringToSend(dataToSend));
+        socket.destroy();
+        return;
+      }
       if (
         connectedPlayers.find(
           (element) =>
             element.playerId == json.playerId &&
             element.sessionId == json.sessionId
-        )
+        ) != null
       ) {
         let dataToSend = JSON.stringify({
           type: "ExitGame",
           request: "Account logged from another location.",
+        });
+        socket.write(formatStringToSend(dataToSend));
+        socket.destroy();
+        return;
+      }
+
+      if (lobbyManager.getPlayerUsingId(json.playerId) == null) {
+        let dataToSend = JSON.stringify({
+          type: "ExitGame",
+          request: "There was a problem, please try again later!",
         });
         socket.write(formatStringToSend(dataToSend));
         socket.destroy();
@@ -67,6 +89,10 @@ server.on("connection", (socket) => {
         socket: socket,
       });
     } else if (json.type == "sendMessage") {
+      let validJson = validateJsonInput.ValidateTcpJoin(json);
+      if (validJson == false) {
+        return;
+      }
       if (
         json.request === "\n" ||
         json.fromId !== playerId ||
@@ -94,7 +120,6 @@ server.on("connection", (socket) => {
     removePlayer(playerId, sessionId, lobbyId);
   });
   socket.on("error", (error) => {
-    console.log(error);
     removePlayer(playerId, sessionId, lobbyId);
   });
 });

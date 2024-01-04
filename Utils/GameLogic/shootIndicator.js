@@ -1,8 +1,13 @@
 const Basic = require("../Basic");
 const lobbyManager = require("../lobbyManager");
 const AntiCheat = require("../AntiCheat");
+const validateJsonInput = require("../validateJsonInput");
 
 async function Handle(json, info, broadcastFunction) {
+  let validJson = validateJsonInput.ValidateShootIndicator(json);
+  if (validJson == false) {
+    return;
+  }
   let time = new Date().getTime();
   let match = lobbyManager.checkIfSessionIsIn(json.sessionId);
   if (match == null) {

@@ -6,14 +6,21 @@ const mongoDB = require("../MongoDBManager");
 const udpErrors = require("../udpErrors");
 const gzipManager = require("../GZipManager");
 
+const validateJsonInput = require("../validateJsonInput");
+
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 function sendData(json, server, info) {
   server.send(gzipManager.Compress(json), info.port, info.address);
 }
 async function Update(json, server, info, broadcastFunction) {
-  let playerInstance = lobbyManager.getPlayerUsingId(json.id);
+  let validJson = validateJsonInput.ValidateUpdate(json);
+  if (validJson == false) {
+    sendData(udpErrors.invalidJson, server, info);
+    return;
+  }
 
+  let playerInstance = lobbyManager.getPlayerUsingId(json.id);
   if (
     playerInstance &&
     (playerInstance.sessionId != json.sessionId ||
@@ -21,11 +28,6 @@ async function Update(json, server, info, broadcastFunction) {
   ) {
     sendData(udpErrors.accountLoggedFromAnotherLocation, server, info);
 
-    return;
-  }
-
-  if (json.loginSessionId.length <= 0) {
-    sendData(udpErrors.loginSessionIdTooShort, server, info);
     return;
   }
   let playerName = "";
@@ -137,6 +139,8 @@ async function Update(json, server, info, broadcastFunction) {
       correctPosition: rules.spawnPos.JsonObj,
       sessionId: sessionId,
       lobbyId: lobby,
+      creator: lobbies[lobby].creator,
+      creatorId: lobbies[lobby].creatorId,
       rules: Object.assign({}, lobbies[lobby].rules, {
         maxMoveDistance: rules.maxMoveDistance,
       }),
@@ -155,37 +159,39 @@ async function Update(json, server, info, broadcastFunction) {
     );
     return;
   } else {
-    if (AntiCheat.PositionChange(server, playerInstance, json, time, info)) {
-      playerInstance.position = json.position;
-      playerInstance.rotation = json.rotation;
-      playerInstance.lastUpdate = time;
-      playerInstance.CameraData = json.CameraData;
-      playerInstance.ping = Basic.Clamp(json.ping, 0, 999);
-      playerInstance.state = json.state;
-    } else {
-      if (lobbyManager.checkIfSessionIsIn(json.sessionId) == null) {
+    if (playerInstance.isDead == false) {
+      if (AntiCheat.PositionChange(playerInstance, json, time, info)) {
+        playerInstance.position = json.position;
+        playerInstance.rotation = json.rotation;
+        playerInstance.lastUpdate = time;
+        playerInstance.CameraData = json.CameraData;
+        playerInstance.ping = Basic.Clamp(json.ping, 0, 999);
+        playerInstance.state = json.state;
+      } else {
+        if (lobbyManager.checkIfSessionIsIn(json.sessionId) == null) {
+          return;
+        }
+        const players = lobbies[playerInstance.lobbyId].players.map(
+          ({
+            ip,
+            deviceId,
+            sessionId,
+            lastUpdate,
+            lastShoot,
+            lobbyId,
+            ...rest
+          }) => rest
+        );
+        let dataToSend = JSON.stringify({
+          type: "position",
+          reason: "hacker",
+          correctPosition: playerInstance.position,
+          players: players,
+        });
+        sendData(dataToSend, server, info);
+
         return;
       }
-      const players = lobbies[playerInstance.lobbyId].players.map(
-        ({
-          ip,
-          deviceId,
-          sessionId,
-          lastUpdate,
-          lastShoot,
-          lobbyId,
-          ...rest
-        }) => rest
-      );
-      let dataToSend = JSON.stringify({
-        type: "position",
-        reason: "hacker",
-        correctPosition: playerInstance.position,
-        players: players,
-      });
-      sendData(dataToSend, server, info);
-
-      return;
     }
   }
   if (lobbyManager.checkIfSessionIsIn(json.sessionId) == null) {

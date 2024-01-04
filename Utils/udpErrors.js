@@ -39,6 +39,10 @@ const lobbyIsFull = JSON.stringify({
   type: "ExitGame",
   reason: "The lobby is full.",
 });
+const invalidJson = JSON.stringify({
+  type: "ExitGame",
+  reason: "Invalid Packet",
+});
 module.exports = {
   outDatedClient,
   lobbyIsFull,
@@ -50,4 +54,5 @@ module.exports = {
   accountLoggedFromAnotherLocation,
   nameTooShort,
   nameTooLong,
+  invalidJson,
 };

@@ -1,7 +1,13 @@
 const Basic = require("../Basic");
 const lobbyManager = require("../lobbyManager");
+const validateJsonInput = require("../validateJsonInput");
 
 async function Disconnect(json, info, broadcastFunction) {
+  let validJson = validateJsonInput.ValidateDisconnect(json);
+  if (validJson == false) {
+    return;
+  }
+
   let playerInstance = lobbyManager.getPlayerUsingId(json.playerId);
   if (playerInstance == null) {
     return;

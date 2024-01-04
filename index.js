@@ -8,6 +8,7 @@ const AntiCheat = require("./Utils/AntiCheat");
 const mongoDB = require("./Utils/MongoDBManager");
 const udpErrors = require("./Utils/udpErrors");
 const gzipManager = require("./Utils/GZipManager");
+const validate = require("./Utils/validateJsonInput");
 
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
@@ -34,8 +35,8 @@ global.defaultWeaponsRules = [
     walkSpeed: 7,
     reloadWalkSpeed: 5,
     recoilMultiplier: 1,
-    shootMaxDistance: 20,
-    shootIndicatorDistance: 20,
+    shootMaxDistance: 50,
+    shootIndicatorDistance: 50,
     bulletsMax: 30,
     reloadTime: 1,
     damage: 10,
@@ -47,8 +48,8 @@ global.defaultWeaponsRules = [
     walkSpeed: 7,
     reloadWalkSpeed: 6,
     recoilMultiplier: 5,
-    shootMaxDistance: 40,
-    shootIndicatorDistance: 40,
+    shootMaxDistance: 100,
+    shootIndicatorDistance: 100,
     bulletsMax: 6,
     reloadTime: 1,
     damage: 33,
@@ -58,7 +59,6 @@ global.defaultWeaponsRules = [
 
 global.defaultRulesForPlayer = {
   maxHealth: 100,
-  jumpCooldown: 1,
 
   respawnTime: 5 * 1000,
 
@@ -66,19 +66,18 @@ global.defaultRulesForPlayer = {
 
   weaponsRules: defaultWeaponsRules,
 };
-global.lobbies = {
-
-};
+global.lobbies = {};
 
 //Game AntiCheat Properties
 global.rules = {
   updateDelay: 50,
   maxMoveDistance: 2.5,
 
-  headPosY: 1,
   headRadius: 0.62,
 
-  spawnPos: new Vectors.Vector3(0, 1.5, 0),
+  jumpCooldown: 1,
+
+  spawnPos: new Vectors.Vector3(0, 2, 0),
 
   maxLobbyPlayers: 50,
 };
@@ -87,7 +86,7 @@ const lobbyManager = require("./Utils/lobbyManager");
 
 const disconnect = require("./Utils/GameLogic/disconnect");
 const shootIndicator = require("./Utils/GameLogic/shootIndicator");
-const shoot = require("./Utils/GameLogic/shoot");
+const DamageHit = require("./Utils/GameLogic/damageHit");
 const bullets = require("./Utils/GameLogic/bullets");
 const updateData = require("./Utils/GameLogic/updateData");
 const keepAlive = require("./Utils/GameLogic/keepAlive");
@@ -114,10 +113,13 @@ server.on("message", async (message, info) => {
     disconnect.Disconnect(json, info, tcp.broadcast);
   } else if (json.type == "shoot") {
     if (json.shootType == "shootIndicator") {
-      bullets.Handle(json, info);
+      if (json.playerHit == false) {
+        bullets.Handle(json, info);
+      }
       shootIndicator.Handle(json, info, tcp.broadcast);
     } else if (json.shootType == "damageHit") {
-      shoot.Shoot(json, tcp.broadcast);
+      DamageHit.Handle(json, tcp.broadcast);
+      bullets.Handle(json, info);
     }
   } else if (json.type == "keepAlive") {
     keepAlive.Handle(json, info, server);

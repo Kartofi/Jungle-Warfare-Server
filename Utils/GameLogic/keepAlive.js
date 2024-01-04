@@ -1,12 +1,18 @@
 const Basic = require("../Basic");
 const lobbyManager = require("../lobbyManager");
 const gzipManager = require("../GZipManager");
+const validateJsonInput = require("../validateJsonInput");
 
 function sendData(json, server, info) {
   server.send(gzipManager.Compress(json), info.port, info.address);
 }
 
 async function Handle(json, info, server) {
+  let validJson = validateJsonInput.ValidateKeepAlive(json);
+  if (validJson == false) {
+    return;
+  }
+
   if (lobbyManager.checkIfSessionIsIn(json.sessionId) == false) {
     return;
   }

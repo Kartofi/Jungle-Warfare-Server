@@ -1,6 +1,6 @@
 let Vectors = require("./Vectors");
 
-function PositionChange(server, player, json, time, info) {
+function PositionChange(player, json, time, info) {
   if (json.position == null || player.position == null) {
     return false;
   }

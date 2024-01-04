@@ -1,8 +1,14 @@
 const Basic = require("../Basic");
 const Vectors = require("../Vectors");
 const lobbyManager = require("../lobbyManager");
+const validateJsonInput = require("../validateJsonInput");
 
-async function Shoot(json, broadcastFunction) {
+async function Handle(json, broadcastFunction) {
+  let validJson = validateJsonInput.ValidateDamageHit(json);
+  if (validJson == false) {
+    return;
+  }
+
   let time = new Date().getTime();
   try {
     let match = lobbyManager.checkIfSessionIsIn(json.sessionId);
@@ -44,10 +50,14 @@ async function Shoot(json, broadcastFunction) {
         ? weaponData.damage * weaponData.headShotMultiplier
         : weaponData.damage;
       // take health
-
       if (targetInstance.health <= 0) {
         targetInstance.health = 0;
         shooterInstance.kills++; // add kills
+        shooterInstance.health = Basic.Clamp(
+          shooterInstance.health + lobbyInstance.rules.maxHealth / 2,
+          0,
+          lobbyInstance.rules.maxHealth
+        );
         targetInstance.isDead = true;
         broadcastFunction(
           JSON.stringify({
@@ -73,4 +83,4 @@ async function Shoot(json, broadcastFunction) {
     console.log(error);
   }
 }
-module.exports = { Shoot };
+module.exports = { Handle };
