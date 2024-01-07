@@ -32,6 +32,9 @@ function ValidateTcpJoin(json) {
 function ValidateTcpChatMessage(json) {
   return v.validate(json, data.tcpChatMessage).errors == 0;
 }
+function ValidateRules(json) {
+  return v.validate(json, data.rules).errors == 0;
+}
 module.exports = {
   ValidateUpdate,
   ValidateShootIndicator,
@@ -41,4 +44,5 @@ module.exports = {
   ValidateDisconnect,
   ValidateTcpJoin,
   ValidateTcpChatMessage,
+  ValidateRules,
 };

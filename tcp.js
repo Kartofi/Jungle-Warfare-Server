@@ -26,8 +26,6 @@ server.on("connection", (socket) => {
     try {
       json = JSON.parse(json);
     } catch (e) {
-      console.log(json);
-      console.log(e);
       return;
     }
     if (json.type == "join") {

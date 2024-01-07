@@ -71,7 +71,7 @@ global.lobbies = {};
 //Game AntiCheat Properties
 global.rules = {
   updateDelay: 50,
-  maxMoveDistance: 2.5,
+  maxMoveDistance: 4,
 
   headRadius: 0.62,
 

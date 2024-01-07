@@ -73,24 +73,64 @@ async function Update(json, server, info, broadcastFunction) {
       }
       let lobbiesKeys = Object.keys(lobbies);
       if (!lobbiesKeys.includes(lobby)) {
-        lobbies[lobby] = {
-          players: [],
-          creator: playerName,
-          creatorId: json.id,
-          rules:
-            !json.rules ||
-            json.rules.weaponsRules.length < defaultWeaponsRules.length ||
-            json.rules.lobbySize <= 0 ||
-            json.rules.lobbySize > rules.maxLobbyPlayers
-              ? defaultRulesForPlayer
-              : json.rules,
-        };
+        let validJsonRules = validateJsonInput.ValidateRules(json.rules);
+        if (validJsonRules == true && json.rules != null) {
+          let lobbyRules =  JSON.parse(JSON.stringify(defaultRulesForPlayer));
+          lobbyRules.lobbySize = Basic.Clamp(
+            json.rules.lobbySize,
+            1,
+            rules.maxLobbyPlayers
+          );
+          lobbyRules.respawnTime = json.rules.respawnTime;
+          lobbyRules.maxHealth = json.rules.maxHealth;
+
+          //Rifle
+          lobbyRules.weaponsRules[0].shootCooldown =
+            json.rules.rifleShootCooldown;
+          lobbyRules.weaponsRules[0].walkSpeed *=
+            json.rules.walkspeedMultiplier;
+          lobbyRules.weaponsRules[0].reloadWalkSpeed *=
+            json.rules.reloadWalkspeedMultiplier;
+          lobbyRules.weaponsRules[0].reloadTime =
+            json.rules.rifleReloadTime * json.rules.reloadTimeMultiplier;
+          lobbyRules.weaponsRules[0].bulletsMax = json.rules.rifleBulletsMax;
+          lobbyRules.weaponsRules[0].headShotMultiplier =
+            json.rules.rifleHeadShotMultiplier * json.rules.headShotMultiplier;
+          //Revolver
+          lobbyRules.weaponsRules[1].shootCooldown =
+            json.rules.revolverShootCooldown;
+          lobbyRules.weaponsRules[1].walkSpeed *=
+            json.rules.walkspeedMultiplier;
+          lobbyRules.weaponsRules[1].reloadWalkSpeed *=
+            json.rules.reloadWalkspeedMultiplier;
+          lobbyRules.weaponsRules[1].reloadTime =
+            json.rules.revolverReloadTime * json.rules.reloadTimeMultiplier;
+          lobbyRules.weaponsRules[1].bulletsMax = json.rules.revolverBulletsMax;
+          lobbyRules.weaponsRules[1].headShotMultiplier =
+            json.rules.revolverHeadShotMultiplier *
+            json.rules.headShotMultiplier;
+
+          lobbies[lobby] = {
+            players: [],
+            creator: playerName,
+            creatorId: json.id,
+            rules: lobbyRules,
+          };
+        } else {
+          lobbies[lobby] = {
+            players: [],
+            creator: playerName,
+            creatorId: json.id,
+            rules: defaultRulesForPlayer,
+          };
+        }
+
         console.log("Created lobby :" + lobby);
       }
     } else {
       lobby = lobbyManager.randomLobby();
       if (lobby == null) {
-        server.send(udpErrors.joinableLobbies, info.port, info.address);
+        sendData(udpErrors.joinableLobbies, server, info);
         return;
       }
     }

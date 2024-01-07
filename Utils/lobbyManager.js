@@ -5,7 +5,8 @@ const tcp = require("../tcp");
 function randomLobby() {
   let keys = Object.keys(lobbies);
   let notFullLobbies = [];
-  keys = keys.filter((lobby) => lobby.players.length < lobby.rules.lobbySize);
+  keys = keys.filter((lobby) => lobbies[lobby].players.length < lobbies[lobby].rules.lobbySize);
+  notFullLobbies.push(...keys);
   if (notFullLobbies.length > 0) {
     if (notFullLobbies.length == 1) {
       return notFullLobbies[0];

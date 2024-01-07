@@ -313,5 +313,75 @@
       "lobbyId",
       "fromId"
     ]
+  },
+  "rules": {
+    "type": "object",
+    "properties": {
+      "maxHealth": {
+        "type": "number"
+      },
+      "respawnTime": {
+        "type": "integer"
+      },
+      "lobbySize": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      },
+      "damageMultiplier": {
+        "type": "number"
+      },
+      "walkspeedMultiplier": {
+        "type": "number"
+      },
+      "reloadTimeMultiplier": {
+        "type": "number"
+      },
+      "reloadWalkspeedMultiplier": {
+        "type": "number"
+      },
+      "revolverDamage": {
+        "type": "number"
+      },
+      "rifleDamage": {
+        "type": "number"
+      },
+      "revolverReloadTime": {
+        "type": "number"
+      },
+      "rifleReloadTime": {
+        "type": "number"
+      },
+      "headShotMultiplier": {
+        "type": "number"
+      },
+      "revolverBulletsMax": {
+        "type": "integer"
+      },
+      "rifleBulletsMax": {
+        "type": "integer"
+      },
+      "rifleShootCooldown": {
+        "type": "number"
+      },
+      "revolverShootCooldown": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "maxHealth",
+      "respawnTime",
+      "lobbySize",
+      "damageMultiplier",
+      "walkspeedMultiplier",
+      "reloadTimeMultiplier",
+      "reloadWalkspeedMultiplier",
+      "revolverDamage",
+      "rifleDamage",
+      "revolverReloadTime",
+      "rifleReloadTime",
+      "headShotMultiplier",
+      "revolverBulletsMax"
+    ]
   }
 }
