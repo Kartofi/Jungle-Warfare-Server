@@ -52,7 +52,7 @@ global.defaultWeaponsRules = [
     shootIndicatorDistance: 100,
     bulletsMax: 6,
     reloadTime: 1,
-    damage: 33,
+    damage: 34,
     headShotMultiplier: 2,
   },
 ];
