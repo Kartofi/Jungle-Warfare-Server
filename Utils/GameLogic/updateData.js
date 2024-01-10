@@ -75,7 +75,7 @@ async function Update(json, server, info, broadcastFunction) {
       if (!lobbiesKeys.includes(lobby)) {
         let validJsonRules = validateJsonInput.ValidateRules(json.rules);
         if (validJsonRules == true && json.rules != null) {
-          let lobbyRules =  JSON.parse(JSON.stringify(defaultRulesForPlayer));
+          let lobbyRules = JSON.parse(JSON.stringify(defaultRulesForPlayer));
           lobbyRules.lobbySize = Basic.Clamp(
             json.rules.lobbySize,
             1,
@@ -83,7 +83,7 @@ async function Update(json, server, info, broadcastFunction) {
           );
           lobbyRules.respawnTime = json.rules.respawnTime;
           lobbyRules.maxHealth = json.rules.maxHealth;
-
+          lobbyRules.jumpPowerMultiplier = json.rules.jumpPowerMultiplier;
           //Rifle
           lobbyRules.weaponsRules[0].shootCooldown =
             json.rules.rifleShootCooldown;

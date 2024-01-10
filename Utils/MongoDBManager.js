@@ -1,5 +1,6 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const crypto = require("crypto");
+const moderation = require("./moderateText");
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(
   "mongodb+srv://kartof:Anatoli7707@kartoffps.samchkx.mongodb.net/?retryWrites=true&w=majority",
@@ -14,7 +15,10 @@ const client = new MongoClient(
 const fs = require("fs");
 let sessionTimeOut = 604800000;
 let maxSessions = 5;
-
+let noPfpImage = Buffer.from(
+  fs.readFileSync("./Images/playerUnknown.png"),
+  "base64"
+);
 async function connect() {
   try {
     // Connect the client to the server
@@ -136,17 +140,41 @@ async function GetAccountData(id) {
     return null;
   }
 }
-async function CreateAccount(name, password, avatar) {
+async function CreateAccount(name, email, password, avatar) {
   if (isConnected() == false) {
     return;
   }
   let collection = client.db("Accounts").collection("Accounts");
+  let playerName = await collection.findOne({ name: name });
+  let playerEmail = await collection.findOne({ email: email });
+
+  if (playerName != null || playerEmail != null) {
+    return { status: "Email or name already in use!" };
+  }
+  let result = moderation.CensorBadWords(name) != name;
+  if (result == true) {
+    return { status: "Name is inappropriate!" };
+  }
+  if (avatar == null) {
+    avatar = noPfpImage;
+  }
+
+  let time = Date.now();
+  let id = time + "" * crypto.randomInt(1000) * crypto.randomInt(1000);
+  id = Number(id);
+  let sessionId = crypto
+    .createHash("md5")
+    .update(id + "-" + time * crypto.randomInt(100))
+    .digest("hex");
+
   collection.insertOne({
+    id: id,
     name: name,
     password: password,
     profilePicture: avatar,
-    loginSessionIds: [],
+    loginSessionIds: [sessionId],
   });
+  return sessionId;
 }
 module.exports = {
   Login,

@@ -1,13 +1,25 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const fs = require("fs");
 
 const app = express();
 var bodyParser = require("body-parser");
 var compression = require("compression");
+const cookieParser = require("cookie-parser");
 
 const port = 2223;
 
 const mongoDB = require("./Utils/MongoDBManager");
+const moderate = require("./Utils/moderateText");
+
+const limiter = rateLimit({
+  max: 200,
+  windowMs: 60000,
+  message: { status: "unSuccessful" },
+});
+app.set("view engine", "ejs");
+app.use(limiter);
+app.use(cookieParser())
 app.use(compression());
 app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(
@@ -16,7 +28,7 @@ app.use(
     extended: true,
   })
 );
-
+// Api
 app.get("/api/lobbies", (req, res) => {
   let dataPlayers = [];
   let keys = Object.keys(lobbies);
@@ -93,6 +105,22 @@ app.post("/api/sessionLogin", async (req, res) => {
   }
   res.send({ status: "Successful", playerName: correct });
 });
+app.get("/moderation/lobbyName/:lobby", async (req, res) => {
+  let lobby = req.params.lobby;
+
+  if (!lobby || lobby.length > 20) {
+    res.send({ status: "unSuccessful" });
+    return;
+  }
+  let result = moderate.CensorBadWords(lobby) != lobby;
+  if (result == true) {
+    res.send({ status: "unSuccessful" });
+    return;
+  } else {
+    res.send({ status: "Successful" });
+    return;
+  }
+});
 app.get("/user/:id", async (req, res) => {
   let id = req.params.id;
   try {
@@ -138,6 +166,11 @@ app.get("/images/users/:id", async (req, res) => {
 
   res.contentType("image/png");
   res.send(img);
+});
+
+// Website
+app.get("/", function (req, res) {
+  res.render("pages/index", { data: JSON.stringify(req.cookies) });
 });
 app.listen(port, () => {
   console.log(`HTTP server is listening on port `, port);

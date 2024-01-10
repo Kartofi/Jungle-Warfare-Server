@@ -334,6 +334,9 @@
       "walkspeedMultiplier": {
         "type": "number"
       },
+      "jumpPowerMultiplier": {
+        "type": "number"
+      },
       "reloadTimeMultiplier": {
         "type": "number"
       },
@@ -374,6 +377,7 @@
       "lobbySize",
       "damageMultiplier",
       "walkspeedMultiplier",
+      "jumpPowerMultiplier",
       "reloadTimeMultiplier",
       "reloadWalkspeedMultiplier",
       "revolverDamage",

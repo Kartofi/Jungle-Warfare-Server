@@ -13,7 +13,7 @@ const validate = require("./Utils/validateJsonInput");
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const tcp = require("./tcp");
-const startMenuTcp = require("./startMenuHttp");
+const startMenuTcp = require("./http");
 
 const port = 2222;
 server.on("listening", () => {
@@ -59,6 +59,8 @@ global.defaultWeaponsRules = [
 
 global.defaultRulesForPlayer = {
   maxHealth: 100,
+
+  jumpPowerMultiplier: 1,
 
   respawnTime: 5 * 1000,
 
