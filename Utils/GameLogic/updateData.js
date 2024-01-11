@@ -141,6 +141,9 @@ async function Update(json, server, info, broadcastFunction) {
     }
     console.log("Player: " + playerName + " joined lobby:" + lobby + "!");
     let weapon = lobbyManager.randomWeapon(lobby);
+    let spawnPos =
+      rules.spawnPos[crypto.randomInt(0, 100) < 50 ? 0 : 1].JsonObj;
+
     lobbies[lobby].players.push({
       name: playerName,
       id: json.id,
@@ -161,7 +164,7 @@ async function Update(json, server, info, broadcastFunction) {
             position: new Vectors.Vector3(0, 0, 0).JsonObj,
             rotation: new Vectors.Vector3(0, 0, 0).JsonObj,
           },
-      position: rules.spawnPos.JsonObj,
+      position: spawnPos,
       rotation: json.rotation,
       lastUpdate: time,
       lastShoot: 0,
@@ -176,7 +179,7 @@ async function Update(json, server, info, broadcastFunction) {
     let dataToSend = JSON.stringify({
       type: "position",
       reason: "startPos",
-      correctPosition: rules.spawnPos.JsonObj,
+      correctPosition: spawnPos,
       sessionId: sessionId,
       lobbyId: lobby,
       creator: lobbies[lobby].creator,

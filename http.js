@@ -24,10 +24,25 @@ app.use(compression());
 app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(
   bodyParser.urlencoded({
+    
     // to support URL-encoded bodies
     extended: true,
   })
 );
+app.use((err, req, res, next) => {
+  if (err) {
+    if (err.type == "entity.too.large"){
+      res.status(413).send({ status: "unSuccessful", error: "Payload too large!" })
+    }else if (err.type == "entity.parse.failed"){
+      res.status(400).send({ status: "unSuccessful", error: "Parse failed!" })
+    }else{
+      res.status(400).send({ status: "unSuccessful", error: err.type })
+    }
+    
+  } else {
+    next()
+  }
+})
 // Api
 app.get("/api/lobbies", (req, res) => {
   let dataPlayers = [];

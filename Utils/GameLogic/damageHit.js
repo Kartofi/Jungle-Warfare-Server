@@ -2,6 +2,7 @@ const Basic = require("../Basic");
 const Vectors = require("../Vectors");
 const lobbyManager = require("../lobbyManager");
 const validateJsonInput = require("../validateJsonInput");
+const crypto = require("crypto");
 
 async function Handle(json, broadcastFunction) {
   let validJson = validateJsonInput.ValidateDamageHit(json);
@@ -75,7 +76,10 @@ async function Handle(json, broadcastFunction) {
         targetInstance.weapon = newWeapon.WeaponName;
         targetInstance.health = lobbyInstance.rules.maxHealth;
         targetInstance.bullets = newWeapon.bulletsMax;
-        targetInstance.position = rules.spawnPos.JsonObj;
+
+        let spawnPos =
+          rules.spawnPos[crypto.randomInt(0, 100) < 50 ? 0 : 1].JsonObj;
+        targetInstance.position = spawnPos;
       }
       shooterInstance.lastShoot = time;
     }

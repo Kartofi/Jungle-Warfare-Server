@@ -1,11 +1,13 @@
 const Vectors = require("./Vectors");
 const Basic = require("./Basic");
 const tcp = require("../tcp");
-
+const crypto = require("crypto");
 function randomLobby() {
   let keys = Object.keys(lobbies);
   let notFullLobbies = [];
-  keys = keys.filter((lobby) => lobbies[lobby].players.length < lobbies[lobby].rules.lobbySize);
+  keys = keys.filter(
+    (lobby) => lobbies[lobby].players.length < lobbies[lobby].rules.lobbySize
+  );
   notFullLobbies.push(...keys);
   if (notFullLobbies.length > 0) {
     if (notFullLobbies.length == 1) {
@@ -21,7 +23,15 @@ function randomWeapon(lobby) {
   if (lobbies[lobby] == null) {
     return;
   }
-  return lobbies[lobby].rules.weaponsRules[0];
+
+  let result = crypto.randomInt(0, 100);
+  let chunkSIze = 100 / lobbies[lobby].rules.weaponsRules.length;
+
+  if (result <= chunkSIze) {
+    return lobbies[lobby].rules.weaponsRules[0];
+  } else {
+    return lobbies[lobby].rules.weaponsRules[1];
+  }
 }
 function getWeaponData(name, lobby) {
   if (lobbies[lobby] == null) {

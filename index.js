@@ -79,7 +79,7 @@ global.rules = {
 
   jumpCooldown: 1,
 
-  spawnPos: new Vectors.Vector3(0, 2, 0),
+  spawnPos: [new Vectors.Vector3(0, 2, 0), new Vectors.Vector3(5, 2, 5)],
 
   maxLobbyPlayers: 50,
 };
