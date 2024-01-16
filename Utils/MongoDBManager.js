@@ -1,17 +1,14 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const crypto = require("crypto");
 const moderation = require("./moderateText");
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(
-  "mongodb+srv://kartof:Anatoli7707@kartoffps.samchkx.mongodb.net/?retryWrites=true&w=majority",
-  {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    },
-  }
-);
+
+const client = new MongoClient(process.env.mongodb, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
 const fs = require("fs");
 let sessionTimeOut = 604800000;
 let maxSessions = 5;

@@ -170,6 +170,7 @@ async function Update(json, server, info, broadcastFunction) {
       lastShoot: 0,
       lastReload: 0,
       reloading: false,
+      spawnDelay: true,
     });
 
     const players = lobbies[lobby].players.map(
@@ -200,9 +201,14 @@ async function Update(json, server, info, broadcastFunction) {
       lobby,
       null
     );
+    await Basic.Wait(rules.spawnCoolDown);
+    let playerInstance = lobbyManager.getPlayerUsingId(json.id);
+    if (playerInstance) {
+      playerInstance.spawnDelay = false;
+    }
     return;
   } else {
-    if (playerInstance.isDead == false) {
+    if (playerInstance.isDead == false && playerInstance.spawnDelay == false) {
       if (AntiCheat.PositionChange(playerInstance, json, time, info)) {
         playerInstance.position = json.position;
         playerInstance.rotation = json.rotation;

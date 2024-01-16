@@ -7,7 +7,7 @@ var bodyParser = require("body-parser");
 var compression = require("compression");
 const cookieParser = require("cookie-parser");
 
-const port = 2223;
+const port = process.env.httpPort | 2223;
 
 const mongoDB = require("./Utils/MongoDBManager");
 const moderate = require("./Utils/moderateText");
@@ -19,30 +19,30 @@ const limiter = rateLimit({
 });
 app.set("view engine", "ejs");
 app.use(limiter);
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(compression());
 app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(
   bodyParser.urlencoded({
-    
     // to support URL-encoded bodies
     extended: true,
   })
 );
 app.use((err, req, res, next) => {
   if (err) {
-    if (err.type == "entity.too.large"){
-      res.status(413).send({ status: "unSuccessful", error: "Payload too large!" })
-    }else if (err.type == "entity.parse.failed"){
-      res.status(400).send({ status: "unSuccessful", error: "Parse failed!" })
-    }else{
-      res.status(400).send({ status: "unSuccessful", error: err.type })
+    if (err.type == "entity.too.large") {
+      res
+        .status(413)
+        .send({ status: "unSuccessful", error: "Payload too large!" });
+    } else if (err.type == "entity.parse.failed") {
+      res.status(400).send({ status: "unSuccessful", error: "Parse failed!" });
+    } else {
+      res.status(400).send({ status: "unSuccessful", error: err.type });
     }
-    
   } else {
-    next()
+    next();
   }
-})
+});
 // Api
 app.get("/api/lobbies", (req, res) => {
   let dataPlayers = [];
@@ -120,22 +120,32 @@ app.post("/api/sessionLogin", async (req, res) => {
   }
   res.send({ status: "Successful", playerName: correct });
 });
-app.get("/moderation/lobbyName/:lobby", async (req, res) => {
-  let lobby = req.params.lobby;
+app.get(
+  "/moderation/lobbyName/:playerId/:loginSessionId/:lobby",
+  async (req, res) => {
+    let lobby = req.params.lobby;
+    let playerId = req.params.playerId;
+    let loginSessionId = req.params.loginSessionId;
 
-  if (!lobby || lobby.length > 20) {
-    res.send({ status: "unSuccessful" });
-    return;
+    if (!lobby || lobby.length > 20 || !loginSessionId || !playerId) {
+      res.send({ status: "unSuccessful" });
+      return;
+    }
+    let mongoDbCheck = mongoDB.CheckSessionId(playerId, loginSessionId);
+    if (mongoDbCheck == false) {
+      res.send({ status: "unSuccessful" });
+      return;
+    }
+    let result = moderate.CensorBadWords(lobby) != lobby;
+    if (result == true) {
+      res.send({ status: "unSuccessful" });
+      return;
+    } else {
+      res.send({ status: "Successful" });
+      return;
+    }
   }
-  let result = moderate.CensorBadWords(lobby) != lobby;
-  if (result == true) {
-    res.send({ status: "unSuccessful" });
-    return;
-  } else {
-    res.send({ status: "Successful" });
-    return;
-  }
-});
+);
 app.get("/user/:id", async (req, res) => {
   let id = req.params.id;
   try {
@@ -186,6 +196,16 @@ app.get("/images/users/:id", async (req, res) => {
 // Website
 app.get("/", function (req, res) {
   res.render("pages/index", { data: JSON.stringify(req.cookies) });
+});
+app.get("/download/launcher", function (req, res) {
+  res.download("./test.mp4");
+});
+
+app.get("/download/game", function (req, res) {
+  res.download("./test.zip");
+});
+app.get("/versionHash", function (req, res) {
+  res.send(currentVersionHash);
 });
 app.listen(port, () => {
   console.log(`HTTP server is listening on port `, port);

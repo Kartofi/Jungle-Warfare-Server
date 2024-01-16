@@ -1,4 +1,5 @@
 const UDP = require("dgram");
+require("dotenv").config();
 
 const server = UDP.createSocket("udp4");
 
@@ -15,13 +16,14 @@ const crypto = require("crypto");
 const tcp = require("./tcp");
 const startMenuTcp = require("./http");
 
-const port = 2222;
+const port = process.env.udpPort | 2222;
 server.on("listening", () => {
   const address = server.address();
   console.log("UDP server is listening on port ", address.port);
 });
 
 const fs = require("fs");
+const path = require("path");
 
 global.version = "1.0.0";
 
@@ -78,8 +80,12 @@ global.rules = {
   headRadius: 0.62,
 
   jumpCooldown: 1,
+  spawnCoolDown: 0.5,
 
-  spawnPos: [new Vectors.Vector3(0, 2, 0), new Vectors.Vector3(5, 2, 5)],
+  spawnPos: [
+    new Vectors.Vector3(20, 2, -21),
+    new Vectors.Vector3(-18.7, 2, 11.75),
+  ],
 
   maxLobbyPlayers: 50,
 };

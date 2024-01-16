@@ -94,6 +94,7 @@ server.on("connection", (socket) => {
       if (
         json.request === "\n" ||
         json.fromId !== playerId ||
+        json.fromId == -1 ||
         json.deviceId !== deviceId ||
         json.sessionId !== sessionId ||
         json.lobbyId !== lobbyId ||
@@ -140,9 +141,9 @@ function removePlayer(playerId, sessionId, lobbyId) {
       player.lobbyId !== lobbyId
   );
 }
-
-server.listen(2222, function () {
-  console.log("TCP server is listening on port ", 2222);
+let port = process.env.tcpPort | 2222;
+server.listen(port, function () {
+  console.log("TCP server is listening on port ", port);
 });
 
 module.exports = { broadcast, removePlayer };

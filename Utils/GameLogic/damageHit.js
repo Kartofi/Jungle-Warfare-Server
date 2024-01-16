@@ -70,7 +70,9 @@ async function Handle(json, broadcastFunction) {
           shooterInstance.lobbyId,
           null
         );
+        targetInstance.spawnDelay = true;
         await Basic.Wait(lobbyInstance.rules.respawnTime);
+        targetInstance.spawnDelay = false;
         let newWeapon = lobbyManager.randomWeapon(match);
         targetInstance.isDead = false;
         targetInstance.weapon = newWeapon.WeaponName;
