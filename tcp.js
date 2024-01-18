@@ -4,7 +4,7 @@ var server = net.createServer();
 
 let connectedPlayers = [];
 
-var moderateText = require("./Utils/moderateText");
+var moderateText = require("./Utils/moderation");
 const Basic = require("./Utils/Basic");
 const lobbyManager = require("./Utils/lobbyManager");
 const gzipManager = require("./Utils/GZipManager");

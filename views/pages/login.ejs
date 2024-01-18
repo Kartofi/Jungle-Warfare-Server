@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <link rel="stylesheet" type="text/css" href="./static/css/index.css" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+  </head>
+  <body>
+    <form action="/login" method="POST">
+      <label for="name">User Name:</label><br />
+      <input
+        minlength="1"
+        maxlength="30"
+        type="text"
+        id="name"
+        name="name"
+        value=""
+        placeholder="Enter Username"
+        oninvalid="this.setCustomValidity('Please Enter Your Username Here')"
+        oninput="this.setCustomValidity('')"
+        required
+      /><br />
+      <label for="name">Password:</label><br />
+      <input
+        minlength="5"
+        maxlength="50"
+        type="password"
+        id="password"
+        name="password"
+        value=""
+        placeholder="Enter Password"
+        required
+      /><br /><br />
+      <% if (error) { %>
+      <a color="red"><%= error %></a>
+      <br />
+      <br />
+      <% } %>
+
+      <input type="submit" value="Login" />
+      <input type="reset" value="Reset Fields" />
+    </form>
+  </body>
+</html>

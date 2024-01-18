@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Dashboard</title>
+  </head>
+  <body>
+    <img src="/images/users/<%= playerId %>" />
+    <br />
+    <a>Welcome back, <%= playerName %></a>
+    <br />
+    <br />
+    <form action="/dashboard/changePassword" method="POST">
+      <label for="name">Old Password:</label><br />
+      <input
+        minlength="5"
+        maxlength="50"
+        type="password"
+        id="oldPassword"
+        name="oldPassword"
+        value=""
+        placeholder="Enter Your Old Password"
+        required
+      /><br /><br />
+      <label for="name">New Password:</label><br />
+      <input
+        minlength="5"
+        maxlength="50"
+        type="password"
+        id="newPassword"
+        name="newPassword"
+        value=""
+        placeholder="Enter Your New Password"
+        required
+      /><br /><br />
+      <input type="submit" value="Change" />
+      <input type="reset" value="Reset Fields" />
+    </form>
+    <br />
+    <form action="/dashboard/changeEmail" method="POST">
+      <label for="name">Email:</label><br />
+      <input
+        type="email"
+        id="newEmail"
+        name="newEmail"
+        value="<%= email %>"
+        placeholder="Enter Your Email"
+        required
+      /><br /><br />
+      <input type="submit" value="Change" />
+      <input type="reset" value="Reset Fields" />
+    </form>
+    <br />
+    <form
+      action="/dashboard/changePFP"
+      method="POST"
+      enctype="multipart/form-data"
+      accept=".jpg,.jpeg,png"
+    >
+      <input type="file" name="image" />
+      <input type="submit" value="Change" />
+    </form>
+    <br />
+    <form action="/logout" method="POST">
+      <input type="submit" value="Log Out" />
+    </form>
+  </body>
+</html>
