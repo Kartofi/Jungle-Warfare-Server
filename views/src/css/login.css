@@ -1,0 +1,10 @@
+body {
+  height: 100vh;
+  color: white;
+}
+
+@media only screen and (max-width: 600px) {
+  .panelForm {
+    width: 100vw;
+  }
+}

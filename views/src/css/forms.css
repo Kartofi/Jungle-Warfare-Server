@@ -1,0 +1,81 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-image: url("/static/images/background.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+body * {
+  transition-duration: 0.05s;
+}
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  background-color: #04aa6d;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition-duration: 0.35s;
+}
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover {
+  background-color: #00f39a;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+.changeInfoBox {
+  background-color: #0000005d;
+  width: fit-content;
+  color: white;
+  padding: 0;
+}
+.panelFormParent {
+  background-color: #00000028;
+  padding: 0px;
+  height: fit-content;
+}
+.panelForm {
+  width: 35vw;
+  padding: 0;
+}
+@media only screen and (max-width: 600px) {
+  .panelForm {
+    width: 100vw;
+  }
+}
+@media only screen and (max-width: 2000px) and (min-width: 600px) {
+  .panelForm {
+    width: 20vw;
+    max-width: 400px;
+    min-width: 400px;
+  }
+}
+@media only screen and (min-width: 2000px) {
+  .panelForm {
+    width: 20vw;
+    min-width: 400px;
+  }
+  body {
+    font-size: 1.5vh;
+  }
+  input {
+    font-size: 1.5vh;
+  }
+}
+
+@media only screen and (min-width: 3000px) {
+  body {
+    font-size: 2.5vh;
+  }
+  input {
+    font-size: 2.5vh;
+  }
+}

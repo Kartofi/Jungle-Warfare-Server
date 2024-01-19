@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="./static/css/login.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/forms.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <title>Forgot <%= info %></title>
+  </head>
+  <body>
+    <% if (info == "Username") { %>
+    <form action="/forgotUsername" method="POST">
+      <input
+        type="email"
+        id="email"
+        name="email"
+        value=""
+        placeholder="Enter Your Email"
+        required
+      />
+      <br />
+      <% if (error != undefined) { %>
+      <a><%= error %></a>
+      <% } %>
+      <br />
+      <input type="submit" value="Send" />
+    </form>
+    <% }else if (info == "Password"){ %>
+    <form action="/forgotPassword" method="POST">
+      <input
+        type="email"
+        id="email"
+        name="email"
+        value=""
+        placeholder="Enter Your Email"
+        required
+      />
+      <br />
+      <% if (error != undefined) { %>
+      <a><%= error %></a>
+      <% } %>
+      <br />
+
+      <input type="submit" value="Send" />
+    </form>
+    <% } %>
+  </body>
+</html>

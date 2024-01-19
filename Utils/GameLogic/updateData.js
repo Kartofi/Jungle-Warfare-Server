@@ -6,6 +6,8 @@ const mongoDB = require("../MongoDBManager");
 const udpErrors = require("../udpErrors");
 const gzipManager = require("../GZipManager");
 
+const idManager = require("../idManager");
+
 const validateJsonInput = require("../validateJsonInput");
 
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
@@ -63,7 +65,7 @@ async function Update(json, server, info, broadcastFunction) {
       return;
     }
 
-    let sessionId = uuidv4();
+    let sessionId = idManager.generateRandomNumberId();
     let lobby;
     if (json.lobbyId != "" && json.lobbyId != null) {
       if (json.lobbyId.length > 20) {

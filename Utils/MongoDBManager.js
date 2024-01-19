@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const moderation = require("./moderation");
 
 const mailManager = require("./mailManager");
+const idManager = require("./idManager");
 
 var validator = require("email-validator");
 
@@ -18,6 +19,8 @@ let sessionTimeOut = 604800000;
 
 let changeInfoMaxTime = 86400000;
 let changeInfoMinTime = 60000;
+
+let forgotInfoMinTime = 60000;
 
 let changePFPMinTime = 8640000000;
 let loginMinTime = 10000;
@@ -65,10 +68,7 @@ async function Login(name, password) {
   if (player != null && passwordValid == true) {
     let time = Date.now();
 
-    let sessionId = crypto
-      .createHash("md5")
-      .update(player.id + "-" + time * crypto.randomInt(100))
-      .digest("hex");
+    let sessionId = idManager.generateRandomStringId();
     let sessions = player.loginSessionIds == null ? [] : player.loginSessionIds;
     sessions.push({
       id: sessionId,
@@ -170,7 +170,7 @@ async function GetAccountData(id) {
   try {
     id = Number(id);
   } catch (e) {
-    return false;
+    return null;
   }
   let collection = client.db("Accounts").collection("Accounts");
   let player = await collection.findOne({ id: id });
@@ -181,7 +181,22 @@ async function GetAccountData(id) {
     return null;
   }
 }
+async function GetAccountDataUsingEmail(email) {
+  if (isConnected() == false) {
+    return null;
+  }
+  if (isEmailValid(email) == false) {
+    return null;
+  }
+  let collection = client.db("Accounts").collection("Accounts");
+  let player = await collection.findOne({ email: email });
 
+  if (player != null) {
+    return player;
+  } else {
+    return null;
+  }
+}
 async function CreateAccount(name, email, password, avatar) {
   if (isConnected() == false) {
     return;
@@ -208,12 +223,9 @@ async function CreateAccount(name, email, password, avatar) {
   }
 
   let time = Date.now();
-  let id = time + "" * crypto.randomInt(1000) * crypto.randomInt(1000);
+  let id = idManager.generateRandomNumberId();
   id = Number(id);
-  let sessionId = crypto
-    .createHash("md5")
-    .update(id + "-" + time * crypto.randomInt(100))
-    .digest("hex");
+  let sessionId = idManager.generateRandomStringId();
   mailManager.SendEmail(email, {
     subject: "Welcome to Jungle Warfare " + name,
     html: "Thanks for joining us. <br> If you have any questions feel free to reply to this email! <br> <br> Best regards, Jungle Warfare  <br> <a href='https://junglewarfare.fun/'>https://junglewarfare.fun/",
@@ -227,6 +239,8 @@ async function CreateAccount(name, email, password, avatar) {
     loginSessionIds: [{ sessionId: sessionId, time: time }],
     changeEmailId: {},
     lastPFPChange: 0,
+    lastForgotUsername: 0,
+    lastForgotPassword: 0,
   });
   return { sessionId: sessionId };
 }
@@ -385,7 +399,7 @@ async function ChangeEmailIdGenerate(id, loginSessionId, newEmail) {
   if (time - playerData.changeEmailId.time <= changeInfoMinTime) {
     return {
       error:
-        "There is a timout of one minute please wait. Time remaining: " +
+        "There is a cooldown of one minute please wait. Time remaining: " +
         Math.round(
           (changeInfoMinTime - time + playerData.changeEmailId.time) / 1000
         ) +
@@ -396,10 +410,7 @@ async function ChangeEmailIdGenerate(id, loginSessionId, newEmail) {
       error: "Url expired, please create a new one.",
     };
   }
-  let emailId = crypto
-    .createHash("md5")
-    .update(newEmail + "-" + time * crypto.randomInt(100))
-    .digest("hex");
+  let emailId = idManager.generateRandomStringId();
 
   let collection = client.db("Accounts").collection("Accounts");
 
@@ -425,7 +436,76 @@ async function ChangeEmailIdGenerate(id, loginSessionId, newEmail) {
 
   return { status: "Sent verification email to " + playerData.email };
 }
+//Forgot Info
+async function ForgotInfo(email, info) {
+  if (isConnected() == false) {
+    return null;
+  }
+  if (isEmailValid(email) == false) {
+    return { error: "Incorrect email!" };
+  }
+  let time = Date.now();
 
+  let playerData = await GetAccountDataUsingEmail(email);
+
+  if (playerData == null) {
+    return { error: "This email is not associated with any account." };
+  }
+  let savedTime = 0;
+
+  if (info == "Username") {
+    savedTime = playerData.lastForgotUsername;
+  } else {
+    savedTime = playerData.lastForgotPassword;
+  }
+  if (time - savedTime <= forgotInfoMinTime) {
+    return {
+      error:
+        "There is a cooldown of one minute please wait. Time remaining: " +
+        Math.round((forgotInfoMinTime - time + savedTime) / 1000) +
+        " seconds.",
+    };
+  }
+  let collection = client.db("Accounts").collection("Accounts");
+  if (info == "Username") {
+    await collection.findOneAndUpdate(
+      { email: email },
+      { $set: { lastForgotUsername: time } }
+    );
+
+    mailManager.SendEmail(playerData.email, {
+      subject: "Jungle Warfare: Username Remider",
+      html:
+        'Your Username is "' +
+        playerData.name +
+        '". <br> <br> Best Regards, Jungle Warfare <br> <a href="https://junglewarfare.fun/">https://junglewarfare.fun/</a>',
+    });
+
+    return { status: "Sent username to " + playerData.email };
+  } else {
+    let password = idManager.generateRandomStringId(10);
+    await collection.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          lastForgotPassword: time,
+          password: password,
+          loginSessionIds: [],
+        },
+      }
+    );
+
+    mailManager.SendEmail(playerData.email, {
+      subject: "Jungle Warfare: Reset Password",
+      html:
+        'Your new automatically generated password is "' +
+        password +
+        '". Use it to login and change your password. <br> <br> Best Regards, Jungle Warfare <br> <a href="https://junglewarfare.fun/">https://junglewarfare.fun/</a>',
+    });
+
+    return { status: "Sent Password to " + playerData.email };
+  }
+}
 module.exports = {
   Login,
   LogOut,
@@ -441,4 +521,6 @@ module.exports = {
   ChangeEmailIdGenerate,
 
   ChangePassword,
+
+  ForgotInfo,
 };

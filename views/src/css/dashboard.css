@@ -1,0 +1,33 @@
+.pfpHolder {
+  width: 200px;
+  height: 200px;
+  padding: 0px;
+  height: fit-content;
+}
+
+.pfp {
+  border-radius: 5%;
+}
+h1 {
+  color: white;
+}
+@media only screen and (max-width: 250px) {
+  .pfpHolder {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .panelForm {
+    width: 100vw;
+  }
+}
+@media only screen and (min-width: 3000px) {
+  .pfpHolder {
+    width: 50%;
+  }
+  .pfp {
+    width: 20vw;
+    height: fit-content;
+  }
+}

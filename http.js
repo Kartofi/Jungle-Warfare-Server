@@ -15,7 +15,7 @@ const cookieParser = require("cookie-parser");
 const port = process.env.httpPort | 2223;
 
 let sessionTimeOut = 604800000;
-
+let allowedAgentInGameStartWith = "Jungle Warfare";
 app.use(
   fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
@@ -83,17 +83,23 @@ app.post("/api/login", async (req, res) => {
   let password = req.body.password;
   let versionHash = req.body.versionHash;
   if (!name || !password) {
-    res.send({ status: "unSuccessful" });
+    res.send({
+      status: "unSuccessful",
+      error: "Username or password missing!",
+    });
     return;
   }
   if (versionHash != currentVersionHash) {
-    res.send({ status: "outdatedClient" });
+    res.send({
+      status: "outdatedClient",
+      error: "Your game is outdated please  update using the launcher.",
+    });
     return;
   }
 
   let loginData = await mongoDB.Login(name, password);
   if (loginData == null || loginData.error != undefined) {
-    res.send({ status: "unSuccessful" });
+    res.send({ status: "unSuccessful", error: loginData.error });
     return;
   }
   res.send({
@@ -124,17 +130,26 @@ app.post("/api/sessionLogin", async (req, res) => {
   let versionHash = req.body.versionHash;
 
   if (!id || !loginSessionId) {
-    res.send({ status: "unSuccessful" });
+    res.send({
+      status: "unSuccessful",
+      error: "No id or login session provided.",
+    });
     return;
   }
   if (versionHash != currentVersionHash) {
-    res.send({ status: "outdatedClient" });
+    res.send({
+      status: "outdatedClient",
+      error: "Your game is outdated please update using the launcher.",
+    });
     return;
   }
 
   let correct = await mongoDB.CheckSessionId(id, loginSessionId);
   if (correct == false) {
-    res.send({ status: "unSuccessful" });
+    res.send({
+      status: "unSuccessful",
+      error: "Invalid login session please login again!",
+    });
 
     return;
   }
@@ -254,6 +269,13 @@ function getCookies(req) {
   }
   return req.cookies;
 }
+//User info
+function getUserData(req) {
+  return {
+    ip: req.ip.replace("::ffff:", ""),
+    browser: req.headers["user-agent"],
+  };
+}
 //Utils
 
 function renderLogin(res, data) {
@@ -269,6 +291,9 @@ function renderChangedInfo(res, type, result, url, urlText) {
     url: url,
     urlText: urlText,
   });
+}
+function renderForgotInfo(res, data) {
+  res.render("pages/forgotInfo", data);
 }
 //Routes Website
 
@@ -356,6 +381,87 @@ app.post("/logout", async function (req, res) {
         "Go to homepage"
       );
     }
+  }
+});
+//Forgot Data
+app.get("/forgotUsername", async function (req, res) {
+  let cookies = getCookies(req);
+  if (cookies == null) {
+    renderForgotInfo(res, {
+      info: "Username",
+      error: undefined,
+    });
+  } else {
+    res.redirect("/dashboard");
+  }
+});
+app.post("/forgotUsername", async function (req, res) {
+  let cookies = getCookies(req);
+  if (cookies == null) {
+    if (req.body.email == undefined) {
+      renderForgotInfo(res, {
+        info: "Username",
+        error: "Please type your email address.",
+      });
+      return;
+    }
+    let forgotInfo = await mongoDB.ForgotInfo(req.body.email, "Username");
+    if (forgotInfo.error != undefined) {
+      renderForgotInfo(res, {
+        info: "Username",
+        error: forgotInfo.error,
+      });
+    } else {
+      renderForgotInfo(res, {
+        info: "Username",
+        error:
+          "Email sent successfully please check your inbox. Email: " +
+          req.body.email,
+      });
+    }
+  } else {
+    res.redirect("/dashboard");
+  }
+});
+
+app.get("/forgotPassword", async function (req, res) {
+  let cookies = getCookies(req);
+  if (cookies == null) {
+    renderForgotInfo(res, {
+      info: "Password",
+      error: undefined,
+    });
+  } else {
+    res.redirect("/dashboard");
+  }
+});
+app.post("/forgotPassword", async function (req, res) {
+  let cookies = getCookies(req);
+  if (cookies == null) {
+    if (req.body.email == undefined) {
+      renderForgotInfo(res, {
+        info: "Password",
+        error: "Please type your email address.",
+      });
+      return;
+    }
+    let forgotInfo = await mongoDB.ForgotInfo(req.body.email, "Password");
+    if (forgotInfo.error != undefined) {
+      renderForgotInfo(res, {
+        info: "Password",
+        error: forgotInfo.error,
+      });
+    } else {
+      deleteCookies(res)
+      renderForgotInfo(res, {
+        info: "Password",
+        error:
+          "Email sent successfully please check your inbox. Email: " +
+          req.body.email,
+      });
+    }
+  } else {
+    res.redirect("/dashboard");
   }
 });
 //Change PFP

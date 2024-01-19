@@ -3,45 +3,64 @@
   <head>
     <meta charset="UTF-8" />
 
-    <link rel="stylesheet" type="text/css" href="./static/css/index.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/login.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/forms.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
   </head>
   <body>
-    <form action="/login" method="POST">
-      <label for="name">User Name:</label><br />
-      <input
-        minlength="1"
-        maxlength="30"
-        type="text"
-        id="name"
-        name="name"
-        value=""
-        placeholder="Enter Username"
-        oninvalid="this.setCustomValidity('Please Enter Your Username Here')"
-        oninput="this.setCustomValidity('')"
-        required
-      /><br />
-      <label for="name">Password:</label><br />
-      <input
-        minlength="5"
-        maxlength="50"
-        type="password"
-        id="password"
-        name="password"
-        value=""
-        placeholder="Enter Password"
-        required
-      /><br /><br />
-      <% if (error) { %>
-      <a color="red"><%= error %></a>
-      <br />
-      <br />
-      <% } %>
-
-      <input type="submit" value="Login" />
-      <input type="reset" value="Reset Fields" />
-    </form>
+    <div
+      class="panelFormParent centerBoth"
+      style="background-color: rgba(0, 0, 0, 0.644)"
+    >
+      <form class="panelForm centered" action="/login" method="POST">
+        <h1>Login</h1>
+        <label for="name">User Name:</label><br />
+        <input
+          minlength="1"
+          maxlength="30"
+          type="text"
+          id="name"
+          name="name"
+          value=""
+          placeholder="Enter Username"
+          oninvalid="this.setCustomValidity('Please Enter Your Username Here')"
+          oninput="this.setCustomValidity('')"
+          required
+        /><br />
+        <label for="name">Password:</label><br />
+        <input
+          minlength="5"
+          maxlength="50"
+          type="password"
+          id="password"
+          name="password"
+          value=""
+          placeholder="Enter Password"
+          required
+        /><br /><br />
+        <% if (error) { %>
+        <a color="red"><%= error %></a>
+        <br />
+        <br />
+        <% } %>
+        <input type="submit" value="Login" />
+        <input type="reset" value="Reset Fields" />
+      </form>
+      <div class="centered">
+        <form action="/forgotUsername" method="get">
+          <input type="submit" value="I forgot my username" />
+        </form>
+        <form action="/forgotPassword" method="get">
+          <input type="submit" value="I forgot my password" />
+        </form>
+      </div>
+    </div>
   </body>
 </html>

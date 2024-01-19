@@ -3,67 +3,106 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="./static/css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/PFPUpload.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/forms.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
     <title>Account Dashboard</title>
   </head>
   <body>
-    <img src="/images/users/<%= playerId %>" />
-    <br />
-    <a>Welcome back, <%= playerName %></a>
-    <br />
-    <br />
-    <form action="/dashboard/changePassword" method="POST">
-      <label for="name">Old Password:</label><br />
-      <input
-        minlength="5"
-        maxlength="50"
-        type="password"
-        id="oldPassword"
-        name="oldPassword"
-        value=""
-        placeholder="Enter Your Old Password"
-        required
-      /><br /><br />
-      <label for="name">New Password:</label><br />
-      <input
-        minlength="5"
-        maxlength="50"
-        type="password"
-        id="newPassword"
-        name="newPassword"
-        value=""
-        placeholder="Enter Your New Password"
-        required
-      /><br /><br />
-      <input type="submit" value="Change" />
-      <input type="reset" value="Reset Fields" />
-    </form>
-    <br />
-    <form action="/dashboard/changeEmail" method="POST">
-      <label for="name">Email:</label><br />
-      <input
-        type="email"
-        id="newEmail"
-        name="newEmail"
-        value="<%= email %>"
-        placeholder="Enter Your Email"
-        required
-      /><br /><br />
-      <input type="submit" value="Change" />
-      <input type="reset" value="Reset Fields" />
-    </form>
-    <br />
-    <form
-      action="/dashboard/changePFP"
-      method="POST"
-      enctype="multipart/form-data"
-      accept=".jpg,.jpeg,png"
-    >
-      <input type="file" name="image" />
-      <input type="submit" value="Change" />
-    </form>
-    <br />
-    <form action="/logout" method="POST">
-      <input type="submit" value="Log Out" />
-    </form>
+    <div class="panelFormParent panelForm centered">
+      <br />
+      <h1 class="username">Welcome back,<br /><b><%= playerName %></b></h1>
+      <div class="centered pfpHolder">
+        <br />
+        <img
+          class="pfp right"
+          width="200"
+          height="200"
+          src="/images/users/<%= playerId %>"
+        />
+      </div>
+
+      <br />
+      <br />
+      <div class="panelForm centered changeInfoBox">
+        <h2>Change Password</h2>
+        <form action="/dashboard/changePassword" method="POST">
+          <label for="oldPassword">Old Password:</label><br />
+          <input
+            minlength="5"
+            maxlength="50"
+            type="password"
+            id="oldPassword"
+            name="oldPassword"
+            value=""
+            placeholder="Enter Your Old Password"
+            required
+          /><br /><br />
+          <label for="newPassword">New Password:</label><br />
+          <input
+            minlength="5"
+            maxlength="50"
+            type="password"
+            id="newPassword"
+            name="newPassword"
+            value=""
+            placeholder="Enter Your New Password"
+            required
+          /><br /><br />
+          <input type="submit" value="Change" />
+          <input type="reset" value="Reset Fields" />
+        </form>
+      </div>
+
+      <br />
+      <div class="panelForm centered changeInfoBox">
+        <h2>Change Email</h2>
+        <form action="/dashboard/changeEmail" method="POST">
+          <label for="newEmail">New Email:</label><br />
+          <input
+            type="email"
+            id="newEmail"
+            name="newEmail"
+            value="<%= email %>"
+            placeholder="Enter Your Email"
+            required
+          /><br /><br />
+          <input type="submit" value="Change" />
+          <input type="reset" value="Reset Field" />
+        </form>
+      </div>
+
+      <br />
+      <div class="panelForm centered changeInfoBox">
+        <h2>Change PFP</h2>
+        <form
+          action="/dashboard/changePFP"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <div class="pfpUpload">
+            <input
+              class="form-control form-control-lg"
+              id="formFileLg"
+              name="image"
+              type="file"
+              accept="image/png, image/jpeg"
+            />
+          </div>
+          <input type="submit" value="Upload" />
+        </form>
+      </div>
+      <br />
+      <form action="/logout" method="POST">
+        <input type="submit" value="Log Out" />
+      </form>
+      <br />
+    </div>
   </body>
 </html>

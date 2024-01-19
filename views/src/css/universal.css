@@ -1,0 +1,42 @@
+.centered {
+  margin: auto;
+  padding: 0px;
+  text-align: center;
+}
+img {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.centered form {
+  display: inline-block;
+}
+.centerBoth {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #525252;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #242424;
+}
