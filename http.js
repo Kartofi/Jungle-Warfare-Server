@@ -452,7 +452,7 @@ app.post("/forgotPassword", async function (req, res) {
         error: forgotInfo.error,
       });
     } else {
-      deleteCookies(res)
+      deleteCookies(res);
       renderForgotInfo(res, {
         info: "Password",
         error:
