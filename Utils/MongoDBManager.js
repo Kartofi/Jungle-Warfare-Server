@@ -17,10 +17,11 @@ const client = new MongoClient(process.env.mongodb, {
 const fs = require("fs");
 let sessionTimeOut = 604800000;
 
-let changeInfoMaxTime = 86400000;
+let changeInfoMaxTime = 60000 * 2;
 let changeInfoMinTime = 60000;
 
 let forgotInfoMinTime = 60000;
+let forgotInfoMaxTime = 60000 * 2;
 
 let changePFPMinTime = 8640000000;
 let loginMinTime = 10000;
@@ -54,7 +55,7 @@ function isConnected() {
 async function isEmailValid(email) {
   return validator.validate(email);
 }
-async function Login(name, password) {
+async function Login(name, password, userData = null) {
   if (isConnected() == false) {
     return false;
   }
@@ -92,12 +93,18 @@ async function Login(name, password) {
       { name: name, password: password },
       { $set: { loginSessionIds: sessions } }
     );
+    let userDataString =
+      userData == null
+        ? ""
+        : "<br> IP: " + userData.ip + "<br>Browser: " + userData.browser;
     mailManager.SendEmail(player.email, {
       subject: "Jungle Warfare: New Login for " + player.name,
       html:
         "There was a successful login attempt for " +
         player.name +
-        ".<br> If this is not you change your password immediately or you might lose your account.<br> <br> Best regards, Jungle Warfare. <br> <a href='https://junglewarfare.fun/'>https://junglewarfare.fun/",
+        ".<br>" +
+        userDataString +
+        "<br> <br> If that was not you change your password immediately or you might lose your account.<br> <br> Best regards, Jungle Warfare. <br> <a href='https://junglewarfare.fun/'>https://junglewarfare.fun/",
     });
     return { loginSessionId: sessionId, playerId: player.id };
   } else {
@@ -237,10 +244,10 @@ async function CreateAccount(name, email, password, avatar) {
     password: password,
     profilePicture: avatar,
     loginSessionIds: [{ sessionId: sessionId, time: time }],
-    changeEmailId: {},
+    changeEmailId: { time: 0, id: undefined },
     lastPFPChange: 0,
     lastForgotUsername: 0,
-    lastForgotPassword: 0,
+    forgotPassword: { time: 0, id: undefined },
   });
   return { sessionId: sessionId };
 }
@@ -355,7 +362,7 @@ async function ChangeEmail(id, changeEmailId) {
       $set: {
         email: playerData.changeEmailId.email,
         loginSessionIds: [],
-        changeEmailId: {},
+        changeEmailId: { time: time, id: undefined },
       },
     }
   );
@@ -426,12 +433,12 @@ async function ChangeEmailIdGenerate(id, loginSessionId, newEmail) {
       newEmail +
       " then click <a href='" +
       rootUrl +
-      "api/approveChangeEmail/" +
+      "dashboard/changeEmail/" +
       playerData.id +
       "/" +
       emailId +
       "'>" +
-      "HERE",
+      "HERE (this link will expire in 120 seconds)",
   });
 
   return { status: "Sent verification email to " + playerData.email };
@@ -456,7 +463,7 @@ async function ForgotInfo(email, info) {
   if (info == "Username") {
     savedTime = playerData.lastForgotUsername;
   } else {
-    savedTime = playerData.lastForgotPassword;
+    savedTime = playerData.forgotPassword.time;
   }
   if (time - savedTime <= forgotInfoMinTime) {
     return {
@@ -483,14 +490,12 @@ async function ForgotInfo(email, info) {
 
     return { status: "Sent username to " + playerData.email };
   } else {
-    let password = idManager.generateRandomStringId(10);
+    let passwordId = idManager.generateRandomStringId(20);
     await collection.findOneAndUpdate(
       { email: email },
       {
         $set: {
-          lastForgotPassword: time,
-          password: password,
-          loginSessionIds: [],
+          forgotPassword: { time: time, id: passwordId },
         },
       }
     );
@@ -498,13 +503,60 @@ async function ForgotInfo(email, info) {
     mailManager.SendEmail(playerData.email, {
       subject: "Jungle Warfare: Reset Password",
       html:
-        'Your new automatically generated password is "' +
-        password +
-        '". Use it to login and change your password. <br> <br> Best Regards, Jungle Warfare <br> <a href="https://junglewarfare.fun/">https://junglewarfare.fun/</a>',
+        "To reset your password click <a href=" +
+        rootUrl +
+        "forgotPassword/" +
+        playerData.id +
+        "/" +
+        passwordId +
+        ">HERE (this link expires in 120 seconds)" +
+        '<br> <br> Best Regards, Jungle Warfare <br> <a href="https://junglewarfare.fun/">https://junglewarfare.fun/</a>',
     });
 
-    return { status: "Sent Password to " + playerData.email };
+    return { status: "Sent password verification to " + playerData.email };
   }
+}
+
+async function ForgotPasswordApprove(id, changePasswordId) {
+  try {
+    id = Number(id);
+  } catch (e) {
+    return { error: "Invalid Id!" };
+  }
+  let time = Date.now();
+
+  let playerData = await GetAccountData(id);
+  if (playerData == null) {
+    return { error: "Account does not exist!" };
+  }
+  if (time - playerData.forgotPassword.time > forgotInfoMinTime) {
+    return {
+      error: "Link expired! Please create a new one.",
+    };
+  }
+  if (playerData.forgotPassword.id != changePasswordId) {
+    return { error: "Change Password id not valid!" };
+  }
+  let password = idManager.generateRandomStringId(10);
+  let collection = client.db("Accounts").collection("Accounts");
+  await collection.findOneAndUpdate(
+    { id: id },
+    {
+      $set: {
+        forgotPassword: { time: time, id: undefined },
+        password: password,
+        loginSessionIds: [],
+      },
+    }
+  );
+  mailManager.SendEmail(playerData.email, {
+    subject: "Jungle Warfare: Reset Password",
+    html:
+      'Your new automatically generated password is "' +
+      password +
+      '". Use it to login and change your password. <br> <br> Best Regards, Jungle Warfare <br> <a href="https://junglewarfare.fun/">https://junglewarfare.fun/</a>',
+  });
+  return true;
 }
 module.exports = {
   Login,
@@ -523,4 +575,5 @@ module.exports = {
   ChangePassword,
 
   ForgotInfo,
+  ForgotPasswordApprove,
 };

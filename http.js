@@ -281,6 +281,12 @@ function getUserData(req) {
 function renderLogin(res, data) {
   res.render("pages/login", data);
 }
+function renderSignUp(res, data) {
+  res.render("pages/signup", data);
+}
+function renderSignup(res, data) {
+  res.render("pages/signup", data);
+}
 function renderDashboard(res, data) {
   res.render("pages/dashboard", data);
 }
@@ -297,6 +303,7 @@ function renderForgotInfo(res, data) {
 }
 //Routes Website
 
+//Login
 app.get("/login", async function (req, res) {
   let cookies = getCookies(req);
   if (cookies == null) {
@@ -315,6 +322,43 @@ app.get("/login", async function (req, res) {
   }
 });
 app.post("/login", async function (req, res) {
+  if (req.body.name == undefined || req.body.password == undefined) {
+    renderLogin(res, { error: "Please type your name and password." });
+    return;
+  }
+  let loginData = await mongoDB.Login(
+    req.body.name,
+    req.body.password,
+    getUserData(req)
+  );
+  if (loginData == null || loginData.error != undefined) {
+    renderLogin(res, loginData);
+    return;
+  } else {
+    setCookies(res, loginData.loginSessionId, loginData.playerId);
+    res.redirect("/dashboard");
+    return;
+  }
+});
+//Sign Up
+app.get("/signup", async function (req, res) {
+  let cookies = getCookies(req);
+  if (cookies == null) {
+    renderSignup(res, { error: "" });
+  } else {
+    let sessionValid = await mongoDB.CheckSessionId(
+      cookies.playerId,
+      cookies.loginSessionId
+    );
+    if (sessionValid == false) {
+      deleteCookies(res);
+      renderSignup(res, { error: "" });
+    } else {
+      res.redirect("/dashboard");
+    }
+  }
+});
+app.post("/signup", async function (req, res) {
   if (req.body.name == undefined || req.body.password == undefined) {
     renderLogin(res, { error: "Please type your name and password." });
     return;
@@ -464,6 +508,41 @@ app.post("/forgotPassword", async function (req, res) {
     res.redirect("/dashboard");
   }
 });
+app.get("/forgotPassword/:playerId/:passwordId", async function (req, res) {
+  if (!req.params.playerId || !req.params.passwordId) {
+    res.redirect("/login");
+    return;
+  }
+  let playerId = -1;
+  try {
+    playerId = Number(req.params.playerId);
+  } catch (e) {
+    renderChangedInfo(res, { status: "Player id is invalid" });
+    return;
+  }
+  let resetPasswordResponse = await mongoDB.ForgotPasswordApprove(
+    playerId,
+    req.params.passwordId
+  );
+  if (resetPasswordResponse == true) {
+    deleteCookies(res);
+    renderChangedInfo(
+      res,
+      "Password",
+      "Successful reset your password! The new automatically generated one was sent to you by email.",
+      "/login",
+      " Go to login page by clicking here."
+    );
+  } else {
+    renderChangedInfo(
+      res,
+      "Password",
+      resetPasswordResponse.error,
+      "/login",
+      " Go to login page by clicking here."
+    );
+  }
+});
 //Change PFP
 let imageTypes = ".jpg,.jpeg,png".split(",");
 app.post("/dashboard/changePFP", async function (req, res) {
@@ -609,49 +688,46 @@ app.post("/dashboard/changeEmail", async function (req, res) {
         "Successfully sent email verification to the old email. Please check your email and click on the url in order to change your email adress to " +
           newEmail,
         "/login",
-        "To login click on this text."
+        "Go Back"
       );
     }
   }
 });
-app.get(
-  "/api/approveChangeEmail/:id/:changeEmailId",
-  async function (req, res) {
-    if (!req.params.id || !req.params.changeEmailId) {
-      res.redirect("/login");
-      return;
-    }
-    let playerId = -1;
-    try {
-      playerId = Number(req.params.id);
-    } catch (e) {
-      renderChangedInfo(res, { status: "Player id is invalid" });
-      return;
-    }
-    let changeEmailResponse = await mongoDB.ChangeEmail(
-      playerId,
-      req.params.changeEmailId
-    );
-    if (changeEmailResponse == true) {
-      deleteCookies(res);
-      renderChangedInfo(
-        res,
-        "Email",
-        "Successful changed email address! Now please login.",
-        "/login",
-        " Go to login page by clicking here."
-      );
-    } else {
-      renderChangedInfo(
-        res,
-        "Email",
-        changeEmailResponse.error,
-        "/login",
-        " Go to homepage by clicking here."
-      );
-    }
+app.get("/dashboard/changeEmail/:id/:changeEmailId", async function (req, res) {
+  if (!req.params.id || !req.params.changeEmailId) {
+    res.redirect("/login");
+    return;
   }
-);
+  let playerId = -1;
+  try {
+    playerId = Number(req.params.id);
+  } catch (e) {
+    renderChangedInfo(res, { status: "Player id is invalid" });
+    return;
+  }
+  let changeEmailResponse = await mongoDB.ChangeEmail(
+    playerId,
+    req.params.changeEmailId
+  );
+  if (changeEmailResponse == true) {
+    deleteCookies(res);
+    renderChangedInfo(
+      res,
+      "Email",
+      "Successful changed email address! Now please login.",
+      "/login",
+      " Go to login page by clicking here."
+    );
+  } else {
+    renderChangedInfo(
+      res,
+      "Email",
+      changeEmailResponse.error,
+      "/login",
+      " Go to homepage by clicking here."
+    );
+  }
+});
 
 //Wrong Url
 app.get("/*", function (req, res) {

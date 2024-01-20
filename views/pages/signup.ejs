@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <link rel="stylesheet" type="text/css" href="./static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/login.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/pfpUpload.css" />
+    <link rel="stylesheet" type="text/css" href="./static/css/forms.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+  </head>
+  <body>
+    <div class="panelFormParent centerBoth">
+      <form class="panelForm centered" action="/signup" method="POST">
+        <a href="/login">
+          <input type="button" value="Login" />
+        </a>
+        <a href="#">
+          <input type="button" value="Sign Up" class="active" />
+        </a>
+        <br />
+        <br />
+        <label for="image">Profile Picture (not required):</label>
+        <br />
+        <br />
+        <div class="pfpUpload">
+          <input
+            class="form-control form-control-lg"
+            id="formFileLg"
+            name="image"
+            type="file"
+            accept="image/png, image/jpeg"
+          />
+        </div>
+
+        <br />
+        <label for="name">User Name:</label>
+        <br />
+        <br />
+        <input
+          minlength="1"
+          maxlength="30"
+          type="text"
+          id="name"
+          name="name"
+          value=""
+          placeholder="Enter Your Username"
+          oninvalid="this.setCustomValidity('Please Enter Your Username Here')"
+          oninput="this.setCustomValidity('')"
+          autocomplete="name"
+          required
+        /><br />
+        <br />
+        <label for="name">Email:</label>
+        <br />
+        <br />
+        <input
+          minlength="1"
+          maxlength="30"
+          type="email"
+          id="email"
+          name="email"
+          value=""
+          placeholder="Enter Your Email"
+          autocomplete="email"
+          required
+        /><br />
+        <br />
+        <label for="name">Password:</label><br />
+        <br />
+        <input
+          minlength="5"
+          maxlength="50"
+          type="password"
+          id="password"
+          name="password"
+          autocomplete="current-password"
+          value=""
+          placeholder="Enter Your Password"
+          required
+        /><br /><br />
+        <% if (error) { %>
+        <a class="error"><%= error %></a>
+        <br />
+        <br />
+        <% } %>
+        <input type="submit" value="Login" />
+        <input type="reset" value="Reset Fields" />
+      </form>
+      <br />
+    </div>
+  </body>
+</html>

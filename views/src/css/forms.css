@@ -1,8 +1,11 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-image: url("/static/images/background.png");
-  background-position: center;
-  background-repeat: no-repeat;
+}
+html {
+  background: url("/static/images/background.png") no-repeat center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
   background-size: cover;
 }
 body * {
@@ -11,26 +14,72 @@ body * {
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
-  background-color: #04aa6d;
+  background-color: #ffffff;
   border: none;
-  color: white;
+  border-radius: 12px;
+  color: rgb(0, 0, 0);
   padding: 16px 32px;
   text-decoration: none;
   margin: 4px 2px;
   cursor: pointer;
-  transition-duration: 0.35s;
+  transition-duration: 0.5s;
 }
 input[type="submit"]:hover,
 input[type="reset"]:hover,
 input[type="button"]:hover {
-  background-color: #00f39a;
-  border: none;
+  background-color: #000000;
   color: white;
   padding: 16px 32px;
   text-decoration: none;
   margin: 4px 2px;
   cursor: pointer;
+
+  filter: drop-shadow(0 0 20px #ffffff) contrast(2) brightness(2);
 }
+input[type="button"].active {
+  background-color: #949dff;
+  color: white;
+  filter: none;
+}
+input[type="button"].active:hover {
+  background-color: #949dff;
+  color: white;
+  filter: none;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  max-width: 190px;
+  color: white;
+  height: 44px;
+  background-color: #05060f5b;
+  border-radius: 0.5rem;
+  padding: 0 1rem;
+  border: 2px solid transparent;
+  font-size: 1rem;
+  transition: border-color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s,
+    color 0.3s cubic-bezier(0.25, 0.01, 0.25, 1) 0s,
+    background 0.2s cubic-bezier(0.25, 0.01, 0.25, 1) 0s;
+}
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="text"]:hover {
+  color: #ffffff;
+  border-color: white;
+}
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus {
+  color: #ffffff;
+  outline: none;
+  border-color: #949dff;
+}
+
+.error {
+  color: rgb(142, 153, 255);
+}
+
 .changeInfoBox {
   background-color: #0000005d;
   width: fit-content;
@@ -38,9 +87,11 @@ input[type="button"]:hover {
   padding: 0;
 }
 .panelFormParent {
-  background-color: #00000028;
+  background-color: rgba(0, 0, 0, 0.644);
   padding: 0px;
   height: fit-content;
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
 }
 .panelForm {
   width: 35vw;
@@ -69,6 +120,9 @@ input[type="button"]:hover {
   input {
     font-size: 1.5vh;
   }
+  input.active {
+    font-size: 1.5vh;
+  }
 }
 
 @media only screen and (min-width: 3000px) {
@@ -77,5 +131,15 @@ input[type="button"]:hover {
   }
   input {
     font-size: 2.5vh;
+  }
+  input.active {
+    font-size: 2.5vh;
+  }
+  input[type="password"],
+  input[type="email"],
+  input[type="file"] {
+    max-width: 100%;
+    width: fit-content;
+    font-size: 1vw;
   }
 }

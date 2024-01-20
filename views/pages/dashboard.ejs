@@ -15,6 +15,13 @@
     <title>Account Dashboard</title>
   </head>
   <body>
+    <div class="topnav">
+      <a class="active" href="#home">Home</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+    </div>
+    <br />
     <div class="panelFormParent panelForm centered">
       <br />
       <h1 class="username">Welcome back,<br /><b><%= playerName %></b></h1>
@@ -31,6 +38,7 @@
       <br />
       <br />
       <div class="panelForm centered changeInfoBox">
+        <br />
         <h2>Change Password</h2>
         <form action="/dashboard/changePassword" method="POST">
           <label for="oldPassword">Old Password:</label><br />
@@ -62,6 +70,7 @@
 
       <br />
       <div class="panelForm centered changeInfoBox">
+        <br />
         <h2>Change Email</h2>
         <form action="/dashboard/changeEmail" method="POST">
           <label for="newEmail">New Email:</label><br />
@@ -80,6 +89,7 @@
 
       <br />
       <div class="panelForm centered changeInfoBox">
+        <br />
         <h2>Change PFP</h2>
         <form
           action="/dashboard/changePFP"
@@ -93,6 +103,7 @@
               name="image"
               type="file"
               accept="image/png, image/jpeg"
+              required
             />
           </div>
           <input type="submit" value="Upload" />
@@ -104,5 +115,6 @@
       </form>
       <br />
     </div>
+    <br />
   </body>
 </html>
