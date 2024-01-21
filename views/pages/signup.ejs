@@ -3,25 +3,35 @@
   <head>
     <meta charset="UTF-8" />
 
-    <link rel="stylesheet" type="text/css" href="./static/css/universal.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/login.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/pfpUpload.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/login.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/pfpUpload.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/forms.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Sign Up</title>
   </head>
   <body>
+    <div class="topnav">
+      <a class="active" href="/">Home</a>
+    </div>
     <div class="panelFormParent centerBoth">
-      <form class="panelForm centered" action="/signup" method="POST">
-        <a href="/login">
+      <br />
+      <form
+        class="panelForm centered"
+        action="/signup"
+        method="POST"
+        autocomplete="off"
+        enctype="multipart/form-data"
+      >
+        <a style="text-decoration: none" href="/login">
           <input type="button" value="Login" />
         </a>
-        <a href="#">
+        <a style="text-decoration: none" href="#">
           <input type="button" value="Sign Up" class="active" />
         </a>
         <br />
@@ -53,11 +63,10 @@
           placeholder="Enter Your Username"
           oninvalid="this.setCustomValidity('Please Enter Your Username Here')"
           oninput="this.setCustomValidity('')"
-          autocomplete="name"
           required
         /><br />
         <br />
-        <label for="name">Email:</label>
+        <label for="email">Email:</label>
         <br />
         <br />
         <input
@@ -68,11 +77,11 @@
           name="email"
           value=""
           placeholder="Enter Your Email"
-          autocomplete="email"
+          autocomplete="off"
           required
         /><br />
         <br />
-        <label for="name">Password:</label><br />
+        <label for="password">Password:</label><br />
         <br />
         <input
           minlength="5"
@@ -83,6 +92,7 @@
           autocomplete="current-password"
           value=""
           placeholder="Enter Your Password"
+          autocomplete="off"
           required
         /><br /><br />
         <% if (error) { %>
@@ -90,7 +100,7 @@
         <br />
         <br />
         <% } %>
-        <input type="submit" value="Login" />
+        <input type="submit" value="Sign Up" />
         <input type="reset" value="Reset Fields" />
       </form>
       <br />

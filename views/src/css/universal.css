@@ -40,23 +40,72 @@ img {
 ::-webkit-scrollbar-thumb:hover {
   background: #242424;
 }
+.thumbnail {
+  border-radius: 10px;
+  width: 95%;
+}
+.homepagePanel {
+  width: 50vw;
+  max-width: 1000px;
+}
+@media only screen and (max-width: 600px) {
+  .homepagePanel {
+    width: 100%;
+  }
+}
+a {
+  color: white;
+}
 .topnav {
-  background-color: #333;
+  background-color: #33333394;
   overflow: hidden;
+  border-radius: 10px;
 }
 .topnav a {
   float: left;
   color: #f2f2f2;
   text-align: center;
-  padding: 14px 16px;
+  padding: 18px 16px;
   text-decoration: none;
   font-size: 17px;
+  transition-duration: 0.35s;
 }
 .topnav a:hover {
   background-color: #ddd;
   color: black;
 }
 .topnav a.active {
-  background-color: #04aa6d;
+  background-color: rgb(142, 153, 255);
   color: white;
+  font-weight: bold;
+}
+.topnav a.active:hover {
+  background-color: rgb(155, 165, 255);
+}
+.topnav a.right {
+  float: right;
+}
+.topnav img.right {
+  height: 55.6px;
+  float: right;
+  border-radius: 5px 0px 0px 5px;
+}
+.topnav a.login {
+  background-color: rgb(142, 153, 255);
+  font-weight: bold;
+  color: white;
+  float: right;
+}
+.topnav a.login:hover {
+  background-color: rgb(155, 165, 255);
+}
+
+.topnav a.logout {
+  background-color: #ff5b5b;
+  font-weight: bold;
+  color: white;
+  float: right;
+}
+.topnav a.logout:hover {
+  background-color: #ff6767;
 }

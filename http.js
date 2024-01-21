@@ -277,13 +277,13 @@ function getUserData(req) {
   };
 }
 //Utils
-
+function renderHome(res, data) {
+  res.render("pages/homepage", data);
+}
 function renderLogin(res, data) {
   res.render("pages/login", data);
 }
-function renderSignUp(res, data) {
-  res.render("pages/signup", data);
-}
+
 function renderSignup(res, data) {
   res.render("pages/signup", data);
 }
@@ -302,7 +302,23 @@ function renderForgotInfo(res, data) {
   res.render("pages/forgotInfo", data);
 }
 //Routes Website
-
+app.get("/", async function (req, res) {
+  let cookies = getCookies(req);
+  if (cookies == null) {
+    renderHome(res, { pfp: null });
+  } else {
+    let sessionValid = await mongoDB.CheckSessionId(
+      cookies.playerId,
+      cookies.loginSessionId
+    );
+    if (sessionValid == false) {
+      deleteCookies(res);
+      renderHome(res, { pfp: null });
+    } else {
+      renderHome(res, { pfp: "/images/users/" + cookies.playerId });
+    }
+  }
+});
 //Login
 app.get("/login", async function (req, res) {
   let cookies = getCookies(req);
@@ -359,13 +375,51 @@ app.get("/signup", async function (req, res) {
   }
 });
 app.post("/signup", async function (req, res) {
-  if (req.body.name == undefined || req.body.password == undefined) {
-    renderLogin(res, { error: "Please type your name and password." });
+  if (
+    req.body.name == undefined ||
+    req.body.password == undefined ||
+    req.body.email == undefined
+  ) {
+    renderLogin(res, { error: "Please type your name,password and email." });
     return;
   }
-  let loginData = await mongoDB.Login(req.body.name, req.body.password);
+
+  if (!isEmailValid(req.body.email)) {
+    renderSignup(res, { error: "Please type valid email address." });
+    return;
+  }
+  let image = null;
+  if (req.files != null && req.files.image != undefined) {
+    let name = req.files.image.name.toLowerCase();
+    let valid = false;
+    imageTypes.forEach((ext) => {
+      if (name.endsWith(ext)) {
+        valid = true;
+      }
+    });
+    if (valid == false) {
+      image = null;
+    } else {
+      try {
+        let buffer = await sharp(req.files.image.data)
+          .resize({ width: 128, height: 128 })
+          .png()
+          .toBuffer();
+        image = buffer;
+      } catch (e) {
+        image = null;
+      }
+    }
+  }
+
+  let loginData = await mongoDB.CreateAccount(
+    req.body.name,
+    req.body.email,
+    req.body.password,
+    image
+  );
   if (loginData == null || loginData.error != undefined) {
-    renderLogin(res, loginData);
+    renderSignup(res, loginData);
     return;
   } else {
     setCookies(res, loginData.loginSessionId, loginData.playerId);
@@ -401,7 +455,7 @@ app.get("/dashboard", async function (req, res) {
     }
   }
 });
-app.post("/logout", async function (req, res) {
+app.get("/logout", async function (req, res) {
   let cookies = getCookies(req);
   if (cookies == null) {
     res.redirect("/login");
@@ -414,15 +468,15 @@ app.post("/logout", async function (req, res) {
         "Logout",
         "Successfully logged out.",
         "/",
-        "Go to homepage"
+        "Go to homepage."
       );
     } else {
       renderChangedInfo(
         res,
         "Logout",
         "There was an error! Please try again later.",
-        "/",
-        "Go to homepage"
+        "/login",
+        "Go to login page."
       );
     }
   }

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jungle Warfare</title>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/PFPUpload.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/forms.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body>
+    <div class="topnav">
+      <a class="active" href="/">Home</a>
+      <% if (pfp != null) { %>
+      <a href="/logout" class="logout">Log out</a>
+      <img class="right" height="40px" src="<%= pfp %>" />
+      <% } else { %>
+      <a href="/signup" class="right login">Sign Up</a>
+      <a href="/login" class="right login">Login</a>
+      <% } %>
+    </div>
+    <br />
+    <div class="panelFormParent centered homepagePanel">
+      <br />
+      <h1>Jungle Warfare</h1>
+      <br />
+      <h1 style="color: red">
+        <b>Pollution...<br />OUR worst enemy</b>
+      </h1>
+
+      <br />
+      <img class="thumbnail" src="/static/images/pollution.png" />
+      <br />
+      <br />
+      <img
+        src="https://www.nhm.ac.uk/content/dam/nhmwww/discover/henderson-island-expedition/henderson-island-full-width.jpg.thumb.1160.1160.jpg"
+        class="thumbnail"
+      />
+      <br />
+      <a
+        href="https://www.nhm.ac.uk/discover/news/2019/april/an-expedition-to-the-uninhabited-island-harbouring-38-million-pi.html"
+        style="text-decoration: none; color: rgb(155, 165, 255)"
+        >Image Source:
+        https://www.nhm.ac.uk/discover/news/2019/april/an-expedition-to-the-uninhabited-island-harbouring-38-million-pi.html</a
+      >
+      <br />
+      <h1>
+        They look similar, <a style="color: red">right</a>?<br />
+        The sad part is the picture on the bottom is a
+        <a style="color: red">REAL</a> beach in year 2024.<br /><br />
+        Imagine if we don't do anything what will happen after
+        <a style="color: red">1000 years</a>. <br /><br />
+        If you want to change the world from the confort of your home just
+        donate to
+        <a
+          style="text-decoration: none; color: rgb(142, 153, 255)"
+          href="https://teamseas.org/"
+          >Team Seas</a
+        >.<br />
+        <br />
+        1$ (or 0,92€) equals to one pound (or 0.45 kg) trash removed from the
+        ocean.
+      </h1>
+      <br />
+      <img class="thumbnail" src="/static/images/bombPollution.png" />
+      <h1>
+        BIG OR SMALL, WE CAN ALL MAKE A DIFFERENCE. <br /><a
+          style="color: rgb(155, 165, 255)"
+          >#TEAMSEAS</a
+        >
+      </h1>
+      <br />
+    </div>
+  </body>
+</html>

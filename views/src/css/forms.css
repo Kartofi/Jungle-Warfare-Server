@@ -14,6 +14,7 @@ body * {
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
+  font-weight: bold;
   background-color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -37,12 +38,12 @@ input[type="button"]:hover {
   filter: drop-shadow(0 0 20px #ffffff) contrast(2) brightness(2);
 }
 input[type="button"].active {
-  background-color: #949dff;
+  background-color: rgb(142, 153, 255);
   color: white;
   filter: none;
 }
 input[type="button"].active:hover {
-  background-color: #949dff;
+  background-color: rgb(155, 165, 255);
   color: white;
   filter: none;
 }
@@ -99,7 +100,7 @@ input[type="text"]:focus {
 }
 @media only screen and (max-width: 600px) {
   .panelForm {
-    width: 100vw;
+    width: 100%;
   }
 }
 @media only screen and (max-width: 2000px) and (min-width: 600px) {

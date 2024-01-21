@@ -23,7 +23,7 @@ let changeInfoMinTime = 60000;
 let forgotInfoMinTime = 60000;
 let forgotInfoMaxTime = 60000 * 2;
 
-let changePFPMinTime = 8640000000;
+let changePFPMinTime = 600000;
 let loginMinTime = 10000;
 
 let maxSessions = 50;
@@ -37,13 +37,6 @@ async function connect() {
     await client.connect();
 
     console.log("Connected to MongoDB");
-    let result = await CreateAccount(
-      "123",
-      "anatoli7707@gmail.com",
-      "123123",
-      null
-    );
-    console.log(result);
   } catch (e) {
     console.log(e);
   }
@@ -225,7 +218,8 @@ async function CreateAccount(name, email, password, avatar) {
   if (password.length < 5 || password.length > 50) {
     return { error: "Password must be between 5 and 50 characters!" };
   }
-  if (avatar == null) {
+  console.log(avatar.length);
+  if (avatar == null || avatar.length == 0) {
     avatar = noPfpImage;
   }
 
@@ -318,7 +312,12 @@ async function ChangePFP(id, loginSessionId, newPFP) {
     if (sub < changePFPMinTime) {
       let date = new Date(changePFPMinTime - sub);
       return {
-        error: "On Cooldown you have " + date.toISOString() + " remaining.",
+        error:
+          "On cooldown you have " +
+          date.getMinutes() +
+          ":" +
+          date.getSeconds() +
+          " remaining.",
       };
     }
     await collection.findOneAndUpdate(
@@ -529,7 +528,7 @@ async function ForgotPasswordApprove(id, changePasswordId) {
   if (playerData == null) {
     return { error: "Account does not exist!" };
   }
-  if (time - playerData.forgotPassword.time > forgotInfoMinTime) {
+  if (time - playerData.forgotPassword.time > forgotInfoMaxTime) {
     return {
       error: "Link expired! Please create a new one.",
     };

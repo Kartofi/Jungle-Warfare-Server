@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
 
-    <link rel="stylesheet" type="text/css" href="./static/css/universal.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/login.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/login.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/forms.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -15,12 +15,16 @@
     <title>Login</title>
   </head>
   <body>
+    <div class="topnav">
+      <a class="active" href="/">Home</a>
+    </div>
     <div class="panelFormParent centerBoth">
+      <br />
       <form class="panelForm centered" action="/login" method="POST">
-        <a href="#">
+        <a style="text-decoration: none" href="#">
           <input type="button" value="Login" class="active" />
         </a>
-        <a href="/signup">
+        <a style="text-decoration: none" href="/signup">
           <input type="button" value="Sign Up" />
         </a>
         <br />
