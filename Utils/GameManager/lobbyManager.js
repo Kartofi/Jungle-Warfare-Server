@@ -1,6 +1,6 @@
-const Vectors = require("./Vectors");
-const Basic = require("./Basic");
-const tcp = require("../tcp");
+const Vectors = require("../General/Vectors");
+const Basic = require("../General/Basic");
+const tcp = require("../../tcp");
 const crypto = require("crypto");
 function randomLobby() {
   let keys = Object.keys(lobbies);

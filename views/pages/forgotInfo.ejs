@@ -29,11 +29,12 @@
         />
         <br />
         <% if (error != undefined) { %>
+        <br />
         <a class="error"><%= error %></a>
         <br />
         <% } %>
         <br />
-        <a href="/login">
+        <a style="text-decoration: none" href="/login">
           <input type="button" value="Go Back" />
         </a>
         <input type="submit" value="Send" />
@@ -50,12 +51,14 @@
         />
         <br />
         <% if (error != undefined) { %>
+        <br />
+        <br />
         <a class="error"><%= error %></a>
         <br />
         <% }else { %>
         <br />
         <% } %>
-        <a href="/login">
+        <a style="text-decoration: none" href="/login">
           <input type="button" value="Go Back" />
         </a>
         <input type="submit" value="Send" />

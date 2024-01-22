@@ -4,11 +4,11 @@ var server = net.createServer();
 
 let connectedPlayers = [];
 
-var moderateText = require("./Utils/moderation");
-const Basic = require("./Utils/Basic");
-const lobbyManager = require("./Utils/lobbyManager");
-const gzipManager = require("./Utils/GZipManager");
-const validateJsonInput = require("./Utils/validateJsonInput");
+var moderateText = require("./Utils/General/moderation");
+const Basic = require("./Utils/General/Basic");
+const lobbyManager = require("./Utils/GameManager/lobbyManager");
+const gzipManager = require("./Utils/General/GZipManager");
+const validateJsonInput = require("./Utils/General/validateJsonInput");
 
 const reload = require("./Utils/GameLogic/reload");
 function formatStringToSend(data) {

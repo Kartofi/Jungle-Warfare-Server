@@ -1,14 +1,14 @@
-const Basic = require("../Basic");
-const lobbyManager = require("../lobbyManager");
-const AntiCheat = require("../AntiCheat");
-const Vectors = require("../Vectors");
-const mongoDB = require("../MongoDBManager");
-const udpErrors = require("../udpErrors");
-const gzipManager = require("../GZipManager");
+const Basic = require("../General/Basic");
+const lobbyManager = require("../GameManager/lobbyManager");
+const AntiCheat = require("../GameManager/AntiCheat");
+const Vectors = require("../General/Vectors");
+const mongoDB = require("../NetworkManager/MongoDBManager");
+const udpErrors = require("../General/udpErrors");
+const gzipManager = require("../General/GZipManager");
 
-const idManager = require("../idManager");
+const idManager = require("../General/idManager");
 
-const validateJsonInput = require("../validateJsonInput");
+const validateJsonInput = require("../General/validateJsonInput");
 
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");

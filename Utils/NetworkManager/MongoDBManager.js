@@ -1,9 +1,9 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const crypto = require("crypto");
-const moderation = require("./moderation");
+const moderation = require("../General/moderation");
 
 const mailManager = require("./mailManager");
-const idManager = require("./idManager");
+const idManager = require("../General/idManager");
 
 var validator = require("email-validator");
 
@@ -218,7 +218,6 @@ async function CreateAccount(name, email, password, avatar) {
   if (password.length < 5 || password.length > 50) {
     return { error: "Password must be between 5 and 50 characters!" };
   }
-  console.log(avatar.length);
   if (avatar == null || avatar.length == 0) {
     avatar = noPfpImage;
   }
@@ -410,10 +409,6 @@ async function ChangeEmailIdGenerate(id, loginSessionId, newEmail) {
           (changeInfoMinTime - time + playerData.changeEmailId.time) / 1000
         ) +
         " seconds.",
-    };
-  } else if (time - playerData.changeEmailId.time >= changeInfoMaxTime) {
-    return {
-      error: "Url expired, please create a new one.",
     };
   }
   let emailId = idManager.generateRandomStringId();

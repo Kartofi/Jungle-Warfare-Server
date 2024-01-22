@@ -1,7 +1,7 @@
-const Basic = require("../Basic");
-const lobbyManager = require("../lobbyManager");
-const AntiCheat = require("../AntiCheat");
-const validateJsonInput = require("../validateJsonInput");
+const Basic = require("../General/Basic");
+const lobbyManager = require("../GameManager/lobbyManager");
+const AntiCheat = require("../GameManager/AntiCheat");
+const validateJsonInput = require("../General/validateJsonInput");
 
 async function Handle(json, info, broadcastFunction) {
   let validJson = validateJsonInput.ValidateShootIndicator(json);

@@ -1,6 +1,6 @@
-const Basic = require("../Basic");
-const lobbyManager = require("../lobbyManager");
-const validateJsonInput = require("../validateJsonInput");
+const Basic = require("../General/Basic");
+const lobbyManager = require("../GameManager/lobbyManager");
+const validateJsonInput = require("../General/validateJsonInput");
 
 async function Disconnect(json, info, broadcastFunction) {
   let validJson = validateJsonInput.ValidateDisconnect(json);

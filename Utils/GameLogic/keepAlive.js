@@ -1,7 +1,7 @@
-const Basic = require("../Basic");
-const lobbyManager = require("../lobbyManager");
-const gzipManager = require("../GZipManager");
-const validateJsonInput = require("../validateJsonInput");
+const Basic = require("../General/Basic");
+const lobbyManager = require("../GameManager/lobbyManager");
+const gzipManager = require("../General/GZipManager");
+const validateJsonInput = require("../General/validateJsonInput");
 
 function sendData(json, server, info) {
   server.send(gzipManager.Compress(json), info.port, info.address);

@@ -1,7 +1,7 @@
-const Basic = require("../Basic");
-const Vectors = require("../Vectors");
-const lobbyManager = require("../lobbyManager");
-const validateJsonInput = require("../validateJsonInput");
+const Basic = require("../General/Basic");
+const Vectors = require("../General/Vectors");
+const lobbyManager = require("../GameManager/lobbyManager");
+const validateJsonInput = require("../General/validateJsonInput");
 const crypto = require("crypto");
 
 async function Handle(json, broadcastFunction) {

@@ -3,13 +3,13 @@ require("dotenv").config();
 
 const server = UDP.createSocket("udp4");
 
-const Vectors = require("./Utils/Vectors");
-const Basic = require("./Utils/Basic");
-const AntiCheat = require("./Utils/AntiCheat");
-const mongoDB = require("./Utils/MongoDBManager");
-const udpErrors = require("./Utils/udpErrors");
-const gzipManager = require("./Utils/GZipManager");
-const validate = require("./Utils/validateJsonInput");
+const Vectors = require("./Utils/General/Vectors");
+const Basic = require("./Utils/General/Basic");
+const AntiCheat = require("./Utils/GameManager/AntiCheat");
+const mongoDB = require("./Utils/NetworkManager/MongoDBManager");
+const udpErrors = require("./Utils/General/udpErrors");
+const gzipManager = require("./Utils/General/GZipManager");
+const validate = require("./Utils/General/validateJsonInput");
 
 const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
@@ -90,7 +90,7 @@ global.rules = {
   maxLobbyPlayers: 50,
 };
 
-const lobbyManager = require("./Utils/lobbyManager");
+const lobbyManager = require("./Utils/GameManager/lobbyManager");
 
 const disconnect = require("./Utils/GameLogic/disconnect");
 const shootIndicator = require("./Utils/GameLogic/shootIndicator");

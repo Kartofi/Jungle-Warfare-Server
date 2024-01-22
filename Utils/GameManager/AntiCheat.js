@@ -1,4 +1,4 @@
-let Vectors = require("./Vectors");
+let Vectors = require("../General/Vectors");
 
 function PositionChange(player, json, time, info) {
   if (json.position == null || player.position == null) {

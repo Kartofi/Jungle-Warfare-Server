@@ -1,15 +1,15 @@
-const Basic = require("../Basic");
-const lobbyManager = require("../lobbyManager");
-const validateJsonInput = require("../validateJsonInput");
+const Basic = require("../General/Basic");
+const lobbyManager = require("../GameManager/lobbyManager");
+const validateJsonInput = require("../General/validateJsonInput");
 
 async function Handle(json, info) {
-  if (!json.sessionId || typeof(json.sessionId) != "string") {
+  if (!json.sessionId || typeof json.sessionId != "string") {
     return;
   }
-  if (!json.playerId || typeof(json.playerId) != "number") {
+  if (!json.playerId || typeof json.playerId != "number") {
     return;
   }
-  if (!json.deviceId || typeof(json.deviceId) != "string") {
+  if (!json.deviceId || typeof json.deviceId != "string") {
     return;
   }
 
