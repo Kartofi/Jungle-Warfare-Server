@@ -29,6 +29,7 @@ const limiter = rateLimit({
 app.set("view engine", "ejs");
 app.use(limiter);
 app.use(cookieParser());
+app.set("trust proxy", 1);
 app.use(compression());
 app.use(bodyParser.json());
 app.use(
@@ -72,7 +73,7 @@ app.get("/versionHash", function (req, res) {
 
 //Wrong Url
 app.get("/*", function (req, res) {
-  res.send("Wrong URL");
+  res.send("<center>404 URL NOT FOUND</center>");
 });
 app.listen(port, () => {
   console.log(`HTTP server is listening on port `, port);

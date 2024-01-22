@@ -223,7 +223,7 @@ async function CreateAccount(name, email, password, avatar) {
   }
 
   let time = Date.now();
-  let id = idManager.generateRandomNumberId();
+  let id = idManager.generateRandomNumberId(8);
   id = Number(id);
   let sessionId = idManager.generateRandomStringId();
   mailManager.SendEmail(email, {
