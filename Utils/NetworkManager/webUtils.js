@@ -29,7 +29,7 @@ function getCookies(req) {
 //User info
 function getUserData(req) {
   return {
-    ip: req.ip.replace("::ffff:", ""),
+    ip: req.clientIp.replace("::ffff:", ""),
     browser: req.headers["user-agent"],
   };
 }

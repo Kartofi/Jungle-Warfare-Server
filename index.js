@@ -1,5 +1,6 @@
 const UDP = require("dgram");
-require("dotenv").config();
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, './Settings/.env') })
 
 const server = UDP.createSocket("udp4");
 
@@ -23,7 +24,7 @@ server.on("listening", () => {
 });
 
 const fs = require("fs");
-const path = require("path");
+
 
 global.version = "1.0.0";
 
