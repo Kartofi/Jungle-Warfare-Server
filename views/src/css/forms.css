@@ -47,7 +47,14 @@ input[type="button"].active:hover {
   color: white;
   filter: none;
 }
-
+.imgPfp {
+  outline: 2px solid rgb(142, 153, 255);
+  outline-offset: -2px;
+}
+.imgPfp:hover {
+  outline: 5px solid rgb(142, 153, 255);
+  outline-offset: -5px;
+}
 input[type="email"],
 input[type="password"],
 input[type="text"] {

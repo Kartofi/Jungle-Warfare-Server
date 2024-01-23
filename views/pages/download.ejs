@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download Launcher</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/Icon.png" />
+    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/universal.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/PFPUpload.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/forms.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body>
+    <div class="topnav">
+      <a class="active" href="/">Home</a>
+      <a class="active" href="#">Download</a>
+      <% if (pfp != null) { %>
+      <a href="/logout" class="logout">Log out</a>
+      <img
+        class="right imgPfp"
+        tooltip
+        onclick="window.location='/dashboard';"
+        style="cursor: pointer"
+        title="➡️Go to Dashboard."
+        height="40px"
+        src="<%=
+      pfp %>"
+      />
+      <% } else { %>
+      <a href="/signup" class="right login">Sign Up</a>
+      <a href="/login" class="right login">Login</a>
+      <% } %>
+    </div>
+    <br />
+    <div class="panelFormParent centered homepagePanel">
+      <br />
+      <img
+        class="thumbnail"
+        style="max-width: 250px"
+        src="/static/images/Icon.png"
+      />
+      <h1>What are you waiting for?</h1>
+      <h1>📃Installation Steps:</h1>
+      <h2>1. Click the download button to download the launcher.</h2>
+      <h2>2. Then open the file and install the launcher.</h2>
+      <h2>3. Then open it and click Play.</h2>
+      <h2>4. Enjoy 😊!</h2>
+      <form action="/download/launcher" method="get">
+        <input type="submit" value="Download ⬇️" style="font-size: 2vw" />
+      </form>
+      <br />
+      <br />
+    </div>
+  </body>
+</html>

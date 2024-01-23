@@ -52,8 +52,9 @@ module.exports = function (app, mongoDB) {
       webUtils.renderSignup(res, loginData);
       return;
     } else {
-      webUtils.setCookies(res, loginData.loginSessionId, loginData.playerId);
-      res.redirect("/dashboard");
+      webUtils.renderSignup(res, {
+        error: "Successfully signed up! Now please login.",
+      });
       return;
     }
   });

@@ -221,11 +221,8 @@ async function CreateAccount(name, email, password, avatar) {
   if (avatar == null || avatar.length == 0) {
     avatar = noPfpImage;
   }
-
-  let time = Date.now();
-  let id = idManager.generateRandomNumberId(8);
+  let id = idManager.generateRandomNumberId(18);
   id = Number(id);
-  let sessionId = idManager.generateRandomStringId();
   mailManager.SendEmail(email, {
     subject: "Welcome to Jungle Warfare " + name,
     html: "Thanks for joining us. <br> If you have any questions feel free to reply to this email! <br> <br> Best regards, Jungle Warfare  <br> <a href='https://junglewarfare.fun/'>https://junglewarfare.fun/",
@@ -236,7 +233,7 @@ async function CreateAccount(name, email, password, avatar) {
     name: name,
     password: password,
     profilePicture: avatar,
-    loginSessionIds: [{ sessionId: sessionId, time: time }],
+    loginSessionIds: [],
     changeEmailId: { time: 0, id: undefined },
     lastPFPChange: 0,
     lastForgotUsername: 0,

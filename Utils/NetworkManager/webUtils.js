@@ -26,10 +26,13 @@ function getCookies(req) {
   }
   return req.cookies;
 }
+const requestIp = require("request-ip");
+
 //User info
 function getUserData(req) {
+  let ip = requestIp.getClientIp(req);
   return {
-    ip: req.clientIp.replace("::ffff:", ""),
+    ip: ip.replace("::ffff:", ""),
     browser: req.headers["user-agent"],
   };
 }

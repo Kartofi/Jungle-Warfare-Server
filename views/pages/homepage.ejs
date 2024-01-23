@@ -17,9 +17,19 @@
   <body>
     <div class="topnav">
       <a class="active" href="/">Home</a>
+      <a class="active" href="/download">Download</a>
       <% if (pfp != null) { %>
       <a href="/logout" class="logout">Log out</a>
-      <img class="right" height="40px" src="<%= pfp %>" />
+      <img
+        class="right imgPfp"
+        tooltip
+        onclick="window.location='/dashboard';"
+        style="cursor: pointer"
+        title="➡️Go to Dashboard."
+        height="40px"
+        src="<%=
+      pfp %>"
+      />
       <% } else { %>
       <a href="/signup" class="right login">Sign Up</a>
       <a href="/login" class="right login">Login</a>

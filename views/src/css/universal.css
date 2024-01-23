@@ -41,14 +41,24 @@ img {
   background: #242424;
 }
 .thumbnail {
+  transition: 0.5s ease;
   border-radius: 10px;
   width: 95%;
 }
+@media only screen and (min-width: 600px) {
+  .thumbnail:hover {
+    -webkit-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+  }
+}
+
 .homepagePanel {
   width: 50vw;
   max-width: 1000px;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600px),
+  only screen and (hover: hover) and (pointer: coarse) {
   .homepagePanel {
     width: 100%;
   }

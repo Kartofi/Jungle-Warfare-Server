@@ -12,7 +12,7 @@ input::file-selector-button {
   padding: 16px 32px;
   border-radius: 12px;
   text-decoration: none;
-  margin: 4px 2px;
+  margin: 4px 4px;
   cursor: pointer;
   transition-duration: 0.5s;
   filter: drop-shadow(0 0 20px #ffffff) contrast(2) brightness(2);

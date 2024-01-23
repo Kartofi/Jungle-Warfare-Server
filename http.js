@@ -3,7 +3,6 @@ const fs = require("fs");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
 var fileUpload = require("express-fileupload");
-const requestIp = require("request-ip");
 
 const app = express();
 var bodyParser = require("body-parser");
@@ -38,8 +37,6 @@ app.use(
   })
 );
 
-require("./Routes/requireAll")(app, mongoDB);
-
 app.use("/static", express.static("./views/src"));
 
 app.use((err, req, res, next) => {
@@ -54,22 +51,11 @@ app.use((err, req, res, next) => {
       res.status(400).send({ status: "unSuccessful", error: err.type });
     }
   } else {
-    const clientIp = requestIp.getClientIp(req);
     next();
   }
 });
 
-// Launcher
-app.get("/download/launcher", function (req, res) {
-  res.download("./test.mp4");
-});
-
-app.get("/download/game", function (req, res) {
-  res.download("./test.zip");
-});
-app.get("/versionHash", function (req, res) {
-  res.send(currentVersionHash);
-});
+require("./Routes/requireAll")(app, mongoDB);
 
 //Wrong Url
 app.get("/*", function (req, res) {

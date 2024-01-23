@@ -7,4 +7,7 @@ body {
   .panelForm {
     width: 100vw;
   }
+  .panelFormParent {
+    width: 100vw;
+  }
 }
