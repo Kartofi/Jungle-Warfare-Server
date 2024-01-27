@@ -20,7 +20,7 @@ app.use(
 const mongoDB = require("./Utils/NetworkManager/MongoDBManager");
 
 const limiter = rateLimit({
-  max: 120,
+  max: 240,
   windowMs: 60000,
   message: { status: "unSuccessful", errpr: "Rate limited!" },
 });

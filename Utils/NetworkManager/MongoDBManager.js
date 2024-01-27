@@ -89,7 +89,12 @@ async function Login(name, password, userData = null) {
     let userDataString =
       userData == null
         ? ""
-        : "<br> IP: " + userData.ip + "<br>Browser: " + userData.browser;
+        : "<br> IP: " +
+          userData.ip +
+          "<br>Location: " +
+          userData.location +
+          "<br>Browser: " +
+          userData.browser;
     mailManager.SendEmail(player.email, {
       subject: "Jungle Warfare: New Login for " + player.name,
       html:
@@ -239,7 +244,7 @@ async function CreateAccount(name, email, password, avatar) {
     lastForgotUsername: 0,
     forgotPassword: { time: 0, id: undefined },
   });
-  return { sessionId: sessionId };
+  return { error: undefined };
 }
 //Website
 async function ChangePassword(id, loginSessionId, oldPassword, newPassword) {

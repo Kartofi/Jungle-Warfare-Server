@@ -11,6 +11,7 @@ function generateRandomNumberId(size = 18) {
 
   return uniqueNumberId.slice(0, size);
 }
+
 module.exports = {
   generateRandomStringId,
   generateRandomNumberId,

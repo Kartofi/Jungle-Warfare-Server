@@ -27,12 +27,18 @@ function getCookies(req) {
   return req.cookies;
 }
 const requestIp = require("request-ip");
+var geoip = require("geoip-lite");
+let regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
 //User info
+
 function getUserData(req) {
   let ip = requestIp.getClientIp(req);
+  var geo = geoip.lookup(ip);
   return {
     ip: ip.replace("::ffff:", ""),
+    location:
+      geo == null ? "Unknown" : regionNames.of(geo.country) + " ," + ip.city,
     browser: req.headers["user-agent"],
   };
 }
