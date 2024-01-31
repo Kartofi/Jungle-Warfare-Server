@@ -57,8 +57,8 @@ async function Update(json, server, info, broadcastFunction) {
   let time = new Date().getTime();
   if (playerInstance == null) {
     if (
-      lobbyManager.checkIfSessionIsIn(json.sessionId) != null || //|| //testing
-      //lobbyManager.checkIfDeviceIdIsIn(json.deviceId) != null
+      lobbyManager.checkIfSessionIsIn(json.sessionId) != null ||
+      lobbyManager.checkIfDeviceIdIsIn(json.deviceId) != null ||
       json.sessionId
     ) {
       sendData(udpErrors.problemRejoin, server, info);
@@ -89,6 +89,10 @@ async function Update(json, server, info, broadcastFunction) {
           //Rifle
           lobbyRules.weaponsRules[0].shootCooldown =
             json.rules.rifleShootCooldown;
+
+          lobbyRules.weaponsRules[0].damage =
+            json.rules.rifleDamage * json.rules.damageMultiplier;
+
           lobbyRules.weaponsRules[0].walkSpeed *=
             json.rules.walkspeedMultiplier;
           lobbyRules.weaponsRules[0].reloadWalkSpeed *=
@@ -101,6 +105,8 @@ async function Update(json, server, info, broadcastFunction) {
           //Revolver
           lobbyRules.weaponsRules[1].shootCooldown =
             json.rules.revolverShootCooldown;
+          lobbyRules.weaponsRules[1].damage =
+            json.rules.revolverDamage * json.rules.damageMultiplier;
           lobbyRules.weaponsRules[1].walkSpeed *=
             json.rules.walkspeedMultiplier;
           lobbyRules.weaponsRules[1].reloadWalkSpeed *=

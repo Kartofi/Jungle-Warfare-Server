@@ -329,7 +329,7 @@ async function ChangePFP(id, loginSessionId, newPFP) {
   }
 }
 //Change Email
-let rootUrl = "http://localhost:2223/";
+let rootUrl = "https://junglewarfare.fun/";
 
 async function ChangeEmail(id, changeEmailId) {
   if (isConnected() == false) {

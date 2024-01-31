@@ -19,18 +19,25 @@ function randomLobby() {
     return null;
   }
 }
-function randomWeapon(lobby) {
+function randomWeapon(lobby, WeaponName = null) {
   if (lobbies[lobby] == null) {
     return;
   }
+  if (WeaponName == null) {
+    let result = crypto.randomInt(0, 100);
+    let chunkSIze = 100 / lobbies[lobby].rules.weaponsRules.length;
 
-  let result = crypto.randomInt(0, 100);
-  let chunkSIze = 100 / lobbies[lobby].rules.weaponsRules.length;
-
-  if (result <= chunkSIze) {
-    return lobbies[lobby].rules.weaponsRules[0];
+    if (result <= chunkSIze) {
+      return lobbies[lobby].rules.weaponsRules[0];
+    } else {
+      return lobbies[lobby].rules.weaponsRules[1];
+    }
   } else {
-    return lobbies[lobby].rules.weaponsRules[1];
+    if (WeaponName == "Rifle") {
+      return lobbies[lobby].rules.weaponsRules[1];
+    } else {
+      return lobbies[lobby].rules.weaponsRules[0];
+    }
   }
 }
 function getWeaponData(name, lobby) {
