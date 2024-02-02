@@ -41,8 +41,8 @@ global.defaultWeaponsRules = [
     shootIndicatorDistance: 50,
     bulletsMax: 30,
     reloadTime: 1,
-    damage: 10,
-    headShotMultiplier: 1.5,
+    damage: 20,
+    headShotMultiplier: 1.75,
   },
   {
     WeaponName: "Revolver",
