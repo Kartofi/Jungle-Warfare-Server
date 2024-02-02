@@ -72,6 +72,9 @@ var validator = require("validator");
 async function isEmailValid(email) {
   return validator.isEmail(email);
 }
+function onlyLettersAndNumbers(str) {
+  return str.match(/^[A-Za-z0-9]+$/) !== null;
+}
 module.exports = {
   deleteCookies,
   setCookies,
@@ -84,4 +87,5 @@ module.exports = {
   renderChangedInfo,
   renderForgotInfo,
   isEmailValid,
+  onlyLettersAndNumbers,
 };

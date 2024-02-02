@@ -18,6 +18,13 @@ module.exports = function (app, mongoDB) {
       webUtils.renderSignup(res, { error: "Please type valid email address." });
       return;
     }
+    if (!webUtils.onlyLettersAndNumbers(req.body.name)) {
+      webUtils.renderSignup(res, {
+        error:
+          "Your username must contain only english characters and numbers with no spaces!",
+      });
+      return;
+    }
     let image = null;
     if (req.files != null && req.files.image != undefined) {
       let name = req.files.image.name.toLowerCase();

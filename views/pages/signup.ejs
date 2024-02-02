@@ -13,6 +13,19 @@
     />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta content="Jungle Warfare : Sign Up" property="og:title" />
+    <meta
+      content="Jungle Warfare is a vibrant multiplayer first-person shooter, offering players an enjoyable and captivating gaming experience set on an abandoned island plagued by pollution."
+      property="og:description"
+    />
+    <meta content="https://junglewarfare.fun/signup" property="og:url" />
+    <meta
+      content="https://junglewarfare.fun/static/images/IconNoBG.png"
+      property="og:image"
+    />
+    <meta content="#42af00" data-react-helmet="true" name="theme-color" />
+
     <title>Sign Up</title>
   </head>
   <body>
@@ -62,9 +75,10 @@
           name="name"
           value=""
           placeholder="Enter Your Username"
-          oninvalid="this.setCustomValidity('Please Enter Your Username Here')"
+          oninvalid="this.setCustomValidity('Your username must contain only english characters and numbers with no spaces!')"
           oninput="this.setCustomValidity('')"
           required
+          pattern="^[A-Za-z0-9]+$"
         /><br />
         <br />
         <label for="email">Email:</label>
