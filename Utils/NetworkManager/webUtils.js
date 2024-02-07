@@ -38,7 +38,7 @@ function getUserData(req) {
   return {
     ip: ip.replace("::ffff:", ""),
     location:
-      geo == null ? "Unknown" : regionNames.of(geo.country) + " ," + ip.city,
+      geo == null ? "Unknown" : regionNames.of(geo.country) + ", " + geo.city,
     browser: req.headers["user-agent"],
   };
 }

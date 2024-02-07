@@ -25,10 +25,10 @@ server.on("listening", () => {
 
 const fs = require("fs");
 
-global.version = "1.0.2";
+global.version = "1.0.3";
 
-global.currentVersionHash = "b24db5c8391ec5c5d93cd0ac083acbdf";
-//console.log(crypto.createHash('md5').update(version).digest('hex'))
+global.currentVersionHash = "1237637816a1ef8e3a33c1191d9dea66";
+//console.log(crypto.createHash("md5").update(version).digest("hex"));
 
 global.defaultWeaponsRules = [
   {
