@@ -56,7 +56,6 @@ app.use((err, req, res, next) => {
 });
 
 require("./Routes/requireAll")(app, mongoDB);
-const webutils = require("./Utils/NetworkManager/webUtils");
 //Wrong Url
 app.get("/*", function (req, res) {
   res.send("<center>404 URL NOT FOUND</center>");
