@@ -1,11 +1,16 @@
 const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport(
-  JSON.parse(process.env.smtpCreds)
-);
-
+const transporter = nodemailer.createTransport({
+  host: process.env.smtpHost,
+  port: process.env.smtpPort,
+  secure: process.env.smtpSecure,
+  auth: {
+    user: process.env.authUser,
+    pass: process.env.authPass,
+  },
+  tls: { rejectUnauthorized: false },
+});
 console.log("Connected to SMTP server");
-
 async function SendEmail(to, message) {
   console.log("Sending email to " + to);
   try {
