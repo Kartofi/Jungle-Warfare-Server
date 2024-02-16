@@ -1,15 +1,10 @@
 const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.abv.bg",
-  port: 465,
-  secure: true,
-  auth: {
-    user: "junglewarfare@abv.bg",
-    pass: "Anatoli7707!",
-  },
-  tls: { rejectUnauthorized: false },
-});
+const transporter = nodemailer.createTransport(
+  JSON.parse(process.env.smtpCreds)
+);
+
+console.log("Connected to SMTP server");
 
 async function SendEmail(to, message) {
   console.log("Sending email to " + to);
